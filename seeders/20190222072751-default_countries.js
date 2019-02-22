@@ -1,5 +1,4 @@
 'use strict';
-const fse = require('fs-extra');
 require('../constants/main');
 
 module.exports = {
