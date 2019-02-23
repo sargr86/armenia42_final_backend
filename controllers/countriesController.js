@@ -1,7 +1,7 @@
 require('../constants/sequelize');
 require('../constants/helpers');
 
-const hasValidationErrors = require('../helpers/hasValidationErrors')
+const hasValidationErrors = require('../helpers/hasValidationErrors');
 
 /**
  * Gets countries list
@@ -27,15 +27,14 @@ exports.add = async (req, res) => {
     let lang = data.lang;
     uploadCountryFlag(req, res, async (err) => {
 
-        if(!hasValidationErrors(req, res, err)){
+        if (!hasValidationErrors(req, res, err)) {
             let names = await translateHelper(data['name_' + lang], lang, 'name');
 
             // Creating the country folder if not exist (maybe creating during multer validation checks by me)
-            let path = OTHER_UPLOADS_FOLDER+folderName(names['name_en']);
-            fse.ensureDir(path);
+            fse.ensureDir(OTHER_UPLOADS_FOLDER + folderName(names['name_en']));
 
-
-            let result = await to(Countries.create({...data, ...names}),res);
+            // Adding the country data to db
+            let result = await to(Countries.create({...data, ...names}), res);
             res.json(result);
         }
     })
@@ -53,7 +52,7 @@ exports.getCountryByName = async (req, res) => {
 
     let result = await to(Countries.findOne({
         where: {name_en: cleanString(data.name_en)},
-        attributes: ['id', 'name_en', 'name_ru', 'name_hy', 'description_' + lang, 'flag_img']
+        attributes: ['id', 'name_en', 'name_ru', 'name_hy','description_' + lang, 'flag_img']
     }), res);
 
     res.json(result);
@@ -67,7 +66,7 @@ exports.getCountryByName = async (req, res) => {
 exports.update = (req, res) => {
     let data = req.body;
     uploadCountryFlag(req, res, async (err) => {
-        if(!hasValidationErrors(req, res, err)){
+        if (!hasValidationErrors(req, res, err)) {
             let {id, ...details} = data;
 
             let result = await to(Countries.update(details, {where: {id: data.id}}));
@@ -88,7 +87,6 @@ exports.remove = async (req, res) => {
 
     let country = await Countries.findOne({where: {id: data.id}});
     let countryFolder = OTHER_UPLOADS_FOLDER + folderName(country['name_en']);
-
 
     let result = await to(Countries.destroy({where: {id: data.id}}));
     res.json(result);

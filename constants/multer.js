@@ -10,20 +10,32 @@ let storage = multer.diskStorage({
 
         let data = req.body;
         let lang = data.lang;
-        let path = OTHER_UPLOADS_FOLDER;
+        let folderPath = OTHER_UPLOADS_FOLDER;
 
 
         // Getting the translations of a name fields passed in request
         if('email' in data){
-            path = USERS_UPLOAD_FOLDER
+            folderPath = USERS_UPLOAD_FOLDER
         }
         else {
-            let names = await translateHelper(data['name_' + lang], lang, 'name');
-            path += folderName(names['name_en'])
+
+            // Update case
+            if('id' in data){
+                console.log(data)
+                folderPath += data.folder;
+            }
+
+            // Insert case
+            else {
+                let names = await translateHelper(data['name_' + lang], lang, 'name');
+                folderPath += folderName(names['name_en'])
+            }
+
 
         }
-        fse.ensureDir(path);
-        cb(null, path)
+        console.log(folderPath)
+        fse.ensureDir(folderPath);
+        cb(null, folderPath)
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname) // already have got Date implemented in the name
