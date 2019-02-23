@@ -1,4 +1,4 @@
-const folderName  = require('../helpers/folderName');
+
 
 
 // Multer stuff

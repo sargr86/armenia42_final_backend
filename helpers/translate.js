@@ -1,6 +1,6 @@
 
 const translate = require('@vitalets/google-translate-api');
-const cleanString = require('./cleanString');
+require('../constants/helpers')
 
 /**
  * Translating selected item to other defined languages

@@ -1,16 +1,18 @@
 require('../constants/sequelize');
 require('../constants/helpers');
 
+const hasValidationErrors = require('../helpers/hasValidationErrors')
+
 /**
  * Gets countries list
  * @param req
  * @param res
  * @returns {Promise<void>}
  */
-exports.get = async(req,res)=>{
+exports.get = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
-    let result = await to(Countries.findAll({attributes:['id','name_en',`name_${lang}`]}),res);
+    let result = await to(Countries.findAll({attributes: ['id', 'name_en', `name_${lang}`]}), res);
     res.json(result)
 };
 
@@ -20,31 +22,74 @@ exports.get = async(req,res)=>{
  * @param res
  * @returns {Promise<void>}
  */
-exports.add = async(req,res)=>{
+exports.add = async (req, res) => {
     let data = req.body;
     let lang = data.lang;
     uploadCountryFlag(req, res, async (err) => {
-        // Gets file type validation error
-        if (req.fileTypeError) {
-            res.status(423).json(req.fileTypeError);
-        }
 
-        // Getting multer errors if any
-        else if (err) res.status(423).json(err);
-
-        // If file validation passed, heading to the request data validation
-        else {
-            // Getting validation result from express-validator
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(422).json(errors.array()[0]);
-            }
+        if(!hasValidationErrors(req, res, err)){
             let names = await translateHelper(data['name_' + lang], lang, 'name');
-            let merged = {...data,...names};
-            Countries.create(merged);
+
+            // Creating the country folder if not exist (maybe creating during multer validation checks by me)
+            let path = OTHER_UPLOADS_FOLDER+folderName(names['name_en']);
+            fse.ensureDir(path);
 
 
-            res.json("OK");
+            let result = await to(Countries.create({...data, ...names}),res);
+            res.json(result);
         }
     })
+};
+
+
+/**
+ * Gets country data by its name
+ * @param req
+ * @param res
+ */
+exports.getCountryByName = async (req, res) => {
+    let data = req.query;
+    let lang = data.lang;
+
+    let result = await to(Countries.findOne({
+        where: {name_en: cleanString(data.name_en)},
+        attributes: ['id', 'name_en', 'name_ru', 'name_hy', 'description_' + lang, 'flag_img']
+    }), res);
+
+    res.json(result);
+};
+
+/**
+ * Updates a country data
+ * @param req
+ * @param res
+ */
+exports.update = (req, res) => {
+    let data = req.body;
+    uploadCountryFlag(req, res, async (err) => {
+        if(!hasValidationErrors(req, res, err)){
+            let {id, ...details} = data;
+
+            let result = await to(Countries.update(details, {where: {id: data.id}}));
+            res.json(result)
+        }
+    })
+};
+
+
+/**
+ * Removes a country data
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+exports.remove = async (req, res) => {
+    let data = req.query;
+
+    let country = await Countries.findOne({where: {id: data.id}});
+    let countryFolder = OTHER_UPLOADS_FOLDER + folderName(country['name_en']);
+
+
+    let result = await to(Countries.destroy({where: {id: data.id}}));
+    res.json(result);
 };
