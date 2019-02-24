@@ -72,8 +72,6 @@ exports.update = async (req, res) => {
             // Renaming the country folder here
             if (data['name_en'] && compareFolders(data['folder'],data['name_en']) ){
 
-                console.log('here')
-
                 let oldFolder = OTHER_UPLOADS_FOLDER + folderName(data['folder']);
                 let newFolder = OTHER_UPLOADS_FOLDER + folderName(data['name_en']);
 
