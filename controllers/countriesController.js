@@ -63,16 +63,24 @@ exports.getCountryByName = async (req, res) => {
  * @param req
  * @param res
  */
-exports.update = (req, res) => {
+exports.update = async(req, res) => {
     let data = req.body;
-    uploadCountryFlag(req, res, async (err) => {
-        if (!hasValidationErrors(req, res, err)) {
-            let {id, ...details} = data;
+    let lang = data.lang;
 
-            let result = await to(Countries.update(details, {where: {id: data.id}}));
-            res.json(result)
-        }
-    })
+    let names = await translateHelper(data['name_' + lang], lang, 'name');
+
+    let oldFolder = OTHER_UPLOADS_FOLDER +folderName(data['folder']).replace(/\//g,"\\");
+    let newFolder = OTHER_UPLOADS_FOLDER +folderName(names['name_en']).replace(/\//g,"\\");
+console.log(oldFolder)
+    console.log(newFolder)
+    // uploadCountryFlag(req, res, async (err) => {
+    //     if (!hasValidationErrors(req, res, err)) {
+    //         let {id, ...details} = data;
+    //
+    //         let result = await to(Countries.update(details, {where: {id: data.id}}));
+    //         res.json(result)
+    //     }
+    // })
 };
 
 
@@ -88,6 +96,13 @@ exports.remove = async (req, res) => {
     let country = await Countries.findOne({where: {id: data.id}});
     let countryFolder = OTHER_UPLOADS_FOLDER + folderName(country['name_en']);
 
-    let result = await to(Countries.destroy({where: {id: data.id}}));
-    res.json(result);
+    let error = removeFolder(countryFolder);
+    if(error) res.status(500).json(result);
+
+    else {
+        // let result = await to(Countries.destroy({where: {id: data.id}}));
+        // res.json(result);
+    }
+
+
 };
