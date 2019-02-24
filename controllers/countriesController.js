@@ -52,7 +52,7 @@ exports.getCountryByName = async (req, res) => {
 
     let result = await to(Countries.findOne({
         where: {name_en: cleanString(data.name_en)},
-        attributes: ['id', 'name_en', 'name_ru', 'name_hy','description_' + lang, 'flag_img']
+        attributes: ['id', 'name_en', 'name_ru', 'name_hy', 'description_' + lang, 'flag_img']
     }), res);
 
     res.json(result);
@@ -63,24 +63,34 @@ exports.getCountryByName = async (req, res) => {
  * @param req
  * @param res
  */
-exports.update = async(req, res) => {
+exports.update = async (req, res) => {
     let data = req.body;
-    let lang = data.lang;
 
-    let names = await translateHelper(data['name_' + lang], lang, 'name');
+    uploadCountryFlag(req, res, async (err) => {
+        if (!hasValidationErrors(req, res, err)) {
 
-    let oldFolder = OTHER_UPLOADS_FOLDER +folderName(data['folder']).replace(/\//g,"\\");
-    let newFolder = OTHER_UPLOADS_FOLDER +folderName(names['name_en']).replace(/\//g,"\\");
-console.log(oldFolder)
-    console.log(newFolder)
-    // uploadCountryFlag(req, res, async (err) => {
-    //     if (!hasValidationErrors(req, res, err)) {
-    //         let {id, ...details} = data;
-    //
-    //         let result = await to(Countries.update(details, {where: {id: data.id}}));
-    //         res.json(result)
-    //     }
-    // })
+            // Renaming the country folder here
+            if (data['name_en'] && compareFolders(data['folder'],data['name_en']) ){
+
+                console.log('here')
+
+                let oldFolder = OTHER_UPLOADS_FOLDER + folderName(data['folder']);
+                let newFolder = OTHER_UPLOADS_FOLDER + folderName(data['name_en']);
+
+                let error = await renameFolder(oldFolder, newFolder);
+                if (error) res.status(500).json(error);
+            }
+
+            // Updating country name in db
+            if (!res.headersSent) {
+                let {id, ...details} = data;
+
+                let result = await to(Countries.update(details, {where: {id: data.id}}));
+                res.json(result)
+            }
+
+        }
+    })
 };
 
 
@@ -92,16 +102,25 @@ console.log(oldFolder)
  */
 exports.remove = async (req, res) => {
     let data = req.query;
+    let withFolder = data.with_folder;
 
-    let country = await Countries.findOne({where: {id: data.id}});
-    let countryFolder = OTHER_UPLOADS_FOLDER + folderName(country['name_en']);
+    // Removing the corresponding folder as well if the option is selected in the country form
+    if (withFolder==='1') {
+        let country = await Countries.findOne({where: {id: data.id}});
+        if (country) {
+            let countryFolder = OTHER_UPLOADS_FOLDER + folderName(country['name_en']);
 
-    let error = removeFolder(countryFolder);
-    if(error) res.status(500).json(result);
+            let error = removeFolder(countryFolder);
+            if (error) res.status(500).json(error);
+        }
 
-    else {
-        // let result = await to(Countries.destroy({where: {id: data.id}}));
-        // res.json(result);
+    }
+
+
+    // Removing country data if there is no error previously
+    if (!req.headersSent) {
+        let result = await to(Countries.destroy({where: {id: data.id}}));
+        res.json(result);
     }
 
 
