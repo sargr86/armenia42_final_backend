@@ -77,7 +77,7 @@ module.exports = {
 
         // Creating default folders for the default provinces
         provinces.map( p =>{
-            fse.ensureDir('uploads/'+p['country'].replace(' ','_')+'/'+p['name_en'].replace(' ','_'));
+            fse.ensureDir(OTHER_UPLOADS_FOLDER+p['country'].replace(' ','_')+'/'+p['name_en'].replace(' ','_'));
         });
 
 

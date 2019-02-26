@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {timestamps:false});
   provinces.associate = function(models) {
     // associations can be defined here
+      provinces.belongsTo(models.countries,{foreignKey: "country_id"});
   };
   return provinces;
 };

@@ -61,5 +61,5 @@ let upload = multer({
     }
 });
 global.uploadProfileImg = upload.single('profile_img_file');
-global.uploadCountryFlag = upload.single('flag_file');
+global.uploadFlag = upload.single('flag_file');
 

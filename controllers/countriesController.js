@@ -27,7 +27,7 @@ exports.get = async (req, res) => {
 exports.add = async (req, res) => {
     let data = req.body;
     let lang = data.lang;
-    uploadCountryFlag(req, res, async (err) => {
+    uploadFlag(req, res, async (err) => {
 
         if (!hasValidationErrors(req, res, err)) {
             let names = await translateHelper(data['name_' + lang], lang, 'name');
@@ -68,7 +68,7 @@ exports.getCountryByName = async (req, res) => {
 exports.update = async (req, res) => {
     let data = req.body;
 
-    uploadCountryFlag(req, res, async (err) => {
+    uploadFlag(req, res, async (err) => {
         if (!hasValidationErrors(req, res, err)) {
 
             // Renaming the country folder here

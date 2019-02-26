@@ -7,7 +7,7 @@ const rules = [
         // Checks to see if a country with requested name exist (only for add-country case)
         if (!('id' in req)) {
             // Retrieving a user with request email
-            let country = await Countries.findOne({
+            let province = await Provinces.findOne({
                 where: {
                     $or: [
                         {name_en: req['name_' + lang]},
@@ -17,15 +17,15 @@ const rules = [
                 }
 
             });
-            // Checking if country exists
-            if (country != null) throw new Error('country_exists_error');
+            // Checking province email exists
+            if (province != null) throw new Error('province_exists_error');
 
         }
 
 
-        // Checking if user wrote country name
+        // Checking if user wrote province name
         if (req['name_' + lang] === '') {
-            throw new Error('country_name_required_error')
+            throw new Error('province_name_required_error')
         }
 
 
