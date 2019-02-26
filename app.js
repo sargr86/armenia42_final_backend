@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({extended: true, limit: postMaxSize + 'mb'}));
 app.use(cors(require('./config/cors')));
 
 // Static resources
-app.use('/uploads/', express.static(UPLOADS_FOLDER));
+app.use(express.static('public'))
 
 
 // Auth Routes

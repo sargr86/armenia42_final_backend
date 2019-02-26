@@ -12,7 +12,7 @@ const hasValidationErrors = require('../helpers/hasValidationErrors');
 exports.get = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
-    let result = await to(Countries.findAll({attributes: ['id', 'name_en', `name_${lang}`]}), res);
+    let result = await to(Countries.findAll({attributes: ['id', 'name_en', `name_${lang}`,'flag_img'], order: [`name_${lang}`]}), res);
     res.json(result)
 };
 
