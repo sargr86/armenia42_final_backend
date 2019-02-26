@@ -1,7 +1,6 @@
 require('../constants/sequelize');
 require('../constants/helpers');
 
-const hasValidationErrors = require('../helpers/hasValidationErrors');
 
 /**
  * Gets countries list
@@ -12,7 +11,10 @@ const hasValidationErrors = require('../helpers/hasValidationErrors');
 exports.get = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
-    let result = await to(Countries.findAll({attributes: ['id', 'name_en', `name_${lang}`,'flag_img'], order: [`name_${lang}`]}), res);
+    let result = await to(Countries.findAll({
+        attributes: ['id', 'name_en', `name_${lang}`, 'flag_img'],
+        order: [`name_${lang}`]
+    }), res);
     res.json(result)
 };
 
@@ -52,7 +54,7 @@ exports.getCountryByName = async (req, res) => {
 
     let result = await to(Countries.findOne({
         where: {name_en: cleanString(data.name_en)},
-        attributes: ['id', 'name_en', 'name_ru', 'name_hy', 'description_' + lang, 'flag_img']
+        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img']
     }), res);
 
     res.json(result);
@@ -70,7 +72,7 @@ exports.update = async (req, res) => {
         if (!hasValidationErrors(req, res, err)) {
 
             // Renaming the country folder here
-            if (data['name_en'] && compareFolders(data['folder'],data['name_en']) ){
+            if (data['name_en'] && compareFolders(data['folder'], data['name_en'])) {
 
                 let oldFolder = OTHER_UPLOADS_FOLDER + folderName(data['folder']);
                 let newFolder = OTHER_UPLOADS_FOLDER + folderName(data['name_en']);
@@ -103,7 +105,7 @@ exports.remove = async (req, res) => {
     let withFolder = data.with_folder;
 
     // Removing the corresponding folder as well if the option is selected in the country form
-    if (withFolder==='1') {
+    if (withFolder === '1') {
         let country = await Countries.findOne({where: {id: data.id}});
         if (country) {
             let countryFolder = OTHER_UPLOADS_FOLDER + folderName(country['name_en']);

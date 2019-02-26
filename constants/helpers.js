@@ -6,3 +6,4 @@ global.folderName  = require('../helpers/folderName');
 global.removeFolder = require('../helpers/removeFolder');
 global.renameFolder = require('../helpers/renameFolder');
 global.compareFolders = require('../helpers/compareFolders');
+global.hasValidationErrors = require('../helpers/hasValidationErrors');
