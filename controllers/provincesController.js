@@ -24,12 +24,14 @@ exports.get = async (req, res) => {
  */
 exports.add = async (req, res) => {
     let data = req.body;
+    let lang = data.lang;
     uploadFlag(req, res, async (err) => {
 
         if (!hasValidationErrors(req, res, err)) {
 
             // Creating the provinces folder
-            let names = createFolder(data);
+            let names = await createFolder(data);
+            let descriptions = await translateHelper(data['description_' + lang], lang, 'description');
 
             // Retrieving country by folder name
             let country = await Countries.findOne({where:{name_en:data.folder.replace(/\//g, "")},attributes:['id']});
@@ -38,7 +40,7 @@ exports.add = async (req, res) => {
             if(country && country['id']){
                 data.country_id = country['id'];
                 // Adding the country data to db
-                let result = await to(Provinces.create({...data, ...names}), res);
+                let result = await to(Provinces.create({...data, ...names,...descriptions}), res);
                 res.json(result);
             }
             else {

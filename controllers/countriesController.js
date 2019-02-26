@@ -31,12 +31,13 @@ exports.add = async (req, res) => {
 
         if (!hasValidationErrors(req, res, err)) {
             let names = await translateHelper(data['name_' + lang], lang, 'name');
+            let descriptions = await translateHelper(data['description_' + lang], lang, 'description');
 
             // Creating the country folder if not exist (maybe creating during multer validation checks by me)
             fse.ensureDir(OTHER_UPLOADS_FOLDER + folderName(names['name_en']));
 
             // Adding the country data to db
-            let result = await to(Countries.create({...data, ...names}), res);
+            let result = await to(Countries.create({...data, ...names,...descriptions}), res);
             res.json(result);
         }
     })
