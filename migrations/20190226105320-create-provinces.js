@@ -31,6 +31,9 @@ module.exports = {
       },
       description_hy: {
         type: Sequelize.STRING
+      },
+      flag_img:{
+          type: Sequelize.STRING
       }
     });
   },

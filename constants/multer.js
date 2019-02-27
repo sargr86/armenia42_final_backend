@@ -27,8 +27,9 @@ let storage = multer.diskStorage({
 
             // Insert case
             else {
+
                 let names = await translateHelper(data['name_' + lang], lang, 'name');
-                folderPath += folderName(names['name_en'])
+                folderPath += folderName(data['folder']+'/'+names['name_en'])
             }
 
 
