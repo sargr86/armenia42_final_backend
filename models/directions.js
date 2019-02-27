@@ -1,6 +1,6 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  const directories = sequelize.define('directions', {
+  const directions = sequelize.define('directions', {
     province_id: DataTypes.INTEGER,
     cover_id: DataTypes.INTEGER,
     name_en: DataTypes.STRING,
@@ -11,8 +11,9 @@ module.exports = (sequelize, DataTypes) => {
     description_hy: DataTypes.TEXT,
     flag_img: DataTypes.STRING
   }, {});
-  directories.associate = function(models) {
+    directions.associate = function(models) {
     // associations can be defined here
+      directions.belongsTo(models.provinces, {foreignKey: "province_id"});
   };
-  return directories;
+  return directions;
 };
