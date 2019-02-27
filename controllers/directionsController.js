@@ -33,6 +33,7 @@ exports.getByName = async (req, res) => {
     let lang = data.lang;
 
     let result = await to(Directions.findOne({
+
         where: {name_en: cleanString(data.name_en)},
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img'],
         include: [
@@ -43,6 +44,10 @@ exports.getByName = async (req, res) => {
             }
         ]
     }), res);
+
+    result = result.get({ plain: true });
+    result['folder'] = folderUrl(result);
+    result['parent_name'] = result['name_en'];
 
     res.json(result);
 };

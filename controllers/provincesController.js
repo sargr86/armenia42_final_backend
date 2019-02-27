@@ -71,6 +71,9 @@ exports.getProvinceByName = async (req, res) => {
         include: [{model: Countries, attributes: ['name_en']}]
     }), res);
 
+    result = result.get({ plain: true });
+    result['folder'] = folderUrl(result);
+
     res.json(result);
 };
 
@@ -121,6 +124,12 @@ exports.update = async (req, res) => {
     })
 };
 
+/**
+ * Removes a province info
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 exports.remove = async (req, res) => {
     let data = req.query;
     let withFolder = data.with_folder;
