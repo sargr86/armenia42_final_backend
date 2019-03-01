@@ -34,7 +34,10 @@ exports.getByName = async (req, res) => {
 
     let result = await to(Directions.findOne({
 
-        where: {name_en: cleanString(data.name_en)},
+        where: {
+            name_en: cleanString(data.name_en),
+            where: sequelize.where(sequelize.col('province.name_en'), cleanString(data.parent_name))
+        },
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img'],
         include: [
             {
@@ -45,7 +48,7 @@ exports.getByName = async (req, res) => {
         ]
     }), res);
 
-    if(result){
+    if (result) {
         result = result.get({plain: true});
         result['folder'] = folderUrl(result);
         result['parent_name'] = result['name_en'];
