@@ -58,6 +58,12 @@ exports.getCountryByName = async (req, res) => {
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img']
     }), res);
 
+    if (result) {
+        result = result.get({plain: true});
+        result['folder'] = folderUrl(result);
+        result['parent_name'] = result['name_en'];
+    }
+
     res.json(result);
 };
 

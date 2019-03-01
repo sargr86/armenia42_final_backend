@@ -71,8 +71,12 @@ exports.getProvinceByName = async (req, res) => {
         include: [{model: Countries, attributes: ['name_en']}]
     }), res);
 
-    result = result.get({ plain: true });
-    result['folder'] = folderUrl(result);
+    if (result) {
+        result = result.get({plain: true});
+        result['folder'] = folderUrl(result);
+        result['parent_name'] = result['name_en'];
+    }
+
 
     res.json(result);
 };
