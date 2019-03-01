@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     description_ru: DataTypes.TEXT,
     description_hy: DataTypes.TEXT,
     flag_img: DataTypes.STRING
-  }, {});
+  }, {underscored: true,timestamps:false});
     directions.associate = function(models) {
     // associations can be defined here
       directions.belongsTo(models.provinces, {foreignKey: "province_id"});

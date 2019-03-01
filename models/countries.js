@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         description_ru: DataTypes.STRING,
         description_hy: DataTypes.STRING,
         flag_img: DataTypes.STRING
-    }, {});
+    }, {underscored: true,timestamps:false});
     countries.associate = function (models) {
         // associations can be defined here
         countries.hasMany(models.provinces, {foreignKey: "country_id"});

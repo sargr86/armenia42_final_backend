@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
         flag_img: DataTypes.STRING
 
 
-    }, {timestamps: false});
+    }, {underscored: true,timestamps:false});
     provinces.associate = function (models) {
         // associations can be defined here
         provinces.belongsTo(models.countries, {foreignKey: "country_id"});
