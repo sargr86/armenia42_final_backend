@@ -1,5 +1,5 @@
 /**
- * Gets locations list
+ * Gets stories list
  * @param req
  * @param res
  * @returns {Promise<void>}
@@ -7,17 +7,23 @@
 exports.get = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
-    let result = await to(Locations.findAll({
+    let result = await to(Stories.findAll({
         attributes: ['id', 'name_en', `name_${lang}`],
-        include: [{
-            model: Directions, where: {name_en: data.parent_name}, include: [
-                {
-                    model: Provinces, attributes: ['name_en'], include: [
-                        {model: Countries, attributes: ['name_en']}
-                    ]
-                },
-            ]
-        }
+        include: [
+            {
+                model: Locations, include: [
+                    {
+                        model: Directions, where: {name_en: data.parent_name}, include: [
+                            {
+                                model: Provinces, attributes: ['name_en'], include: [
+                                    {model: Countries, attributes: ['name_en']}
+                                ]
+                            },
+                        ]
+                    }
+
+                ]
+            }
 
 
         ],
@@ -27,7 +33,7 @@ exports.get = async (req, res) => {
 };
 
 /**
- * Gets a direction by name
+ * Gets a story by name
  * @param req
  * @param res
  * @returns {Promise<void>}
@@ -36,22 +42,31 @@ exports.getByName = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
 
-    let result = await to(Locations.findOne({
+    let result = await to(Stories.findOne({
 
         where: {
-            name_en: cleanString(data.name_en),
-            where: sequelize.where(sequelize.col('direction.name_en'), cleanString(data.parent_name))
+            name_en: cleanString(data.name_en, true),
+            where: sequelize.where(sequelize.col('location.name_en'), cleanString(data.parent_name, true))
         },
-        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img'],
-        include: [{
-            model: Directions, where: {name_en: data.parent_name}, include: [
-                {
-                    model: Provinces, attributes: ['name_en'], include: [
-                        {model: Countries, attributes: ['name_en']}
-                    ]
-                },
-            ]
-        }]
+        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`],
+        include: [
+            {
+                model: Locations, include: [
+                    {
+                        model: Directions, include: [
+                            {
+                                model: Provinces, attributes: ['name_en'], include: [
+                                    {model: Countries, attributes: ['name_en']}
+                                ]
+                            },
+                        ]
+                    }
+
+                ]
+            }
+
+
+        ],
     }), res);
 
     if (result) {
@@ -65,7 +80,7 @@ exports.getByName = async (req, res) => {
 };
 
 /**
- * Adds a new location
+ * Adds a new story
  * @param req
  * @param res
  * @returns {Promise<void>}
@@ -82,27 +97,27 @@ exports.add = async (req, res) => {
             let descriptions = await translateHelper(data['description_' + lang], lang, 'description');
 
             // Retrieving country by folder name
-            let direction = await Directions.findOne({
+            let location = await Locations.findOne({
                 where: {name_en: data.parent_name},
                 attributes: ['id']
             });
 
             // If retrieved adding the province to it, otherwise throwing an error
-            if (direction && direction['id']) {
-                data.direction_id = direction['id'];
+            if (location && location['id']) {
+                data.location_id = location['id'];
                 // Adding the country data to db
-                let result = await to(Locations.create({...data, ...names, ...descriptions}), res);
+                let result = await to(Stories.create({...data, ...names, ...descriptions}), res);
                 res.json(result);
             }
             else {
-                res.status(500).json('direction_not_found')
+                res.status(500).json('location_not_found')
             }
         }
     })
 };
 
 /**
- * Updates the selected location
+ * Updates the selected story
  * @param req
  * @param res
  * @returns {Promise<void>}
@@ -127,7 +142,7 @@ exports.update = async (req, res) => {
             if (!res.headersSent) {
                 let {id, ...details} = data;
 
-                let result = await to(Locations.update(details, {where: {id: data.id}}));
+                let result = await to(Stories.update(details, {where: {id: data.id}}));
                 res.json(result)
             }
 
@@ -135,21 +150,27 @@ exports.update = async (req, res) => {
     })
 };
 
+/**
+ * Removes a story
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 exports.remove = async (req, res) => {
     let data = req.query;
     let withFolder = data.with_folder;
 
     // Removing the corresponding folder as well if the option is selected in the country form
     if (withFolder === '1') {
-        let provinceFolder = OTHER_UPLOADS_FOLDER + folderName(data['folder']);
+        let storyFolder = OTHER_UPLOADS_FOLDER + folderName(data['folder']);
 
-        let error = removeFolder(provinceFolder);
+        let error = removeFolder(storyFolder);
         if (error) res.status(500).json(error);
     }
 
     // Removing country data if there is no error previously
     if (!req.headersSent) {
-        let result = await to(Locations.destroy({where: {id: data.id}}));
+        let result = await to(Stories.destroy({where: {id: data.id}}));
         res.json(result);
     }
 };

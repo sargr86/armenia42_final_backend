@@ -7,3 +7,4 @@ global.Countries = db.countries;
 global.Provinces = db.provinces;
 global.Directions = db.directions;
 global.Locations = db.locations;
+global.Stories = db.stories;
