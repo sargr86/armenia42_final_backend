@@ -18,14 +18,14 @@ exports.get = async (req, res) => {
                 required: false
             },
             {
-            model: Directions, where: {name_en: data.parent_name}, include: [
-                {
-                    model: Provinces, attributes: ['name_en'], include: [
-                        {model: Countries, attributes: ['name_en']}
-                    ]
-                },
-            ]
-        }
+                model: Directions, where: {name_en: data.parent_name}, include: [
+                    {
+                        model: Provinces, attributes: ['name_en'], include: [
+                            {model: Countries, attributes: ['name_en']}
+                        ]
+                    },
+                ]
+            }
 
 
         ],
@@ -55,19 +55,19 @@ exports.getByName = async (req, res) => {
 
             {
                 model: Categories,
-                attributes: [['id','value'], ['name_' + data.lang, 'label']],
+                attributes: [['id', 'value'], ['name_' + data.lang, 'label']],
                 through: {attributes: []},
                 required: false
             },
             {
-            model: Directions, where: {name_en: data.parent_name}, include: [
-                {
-                    model: Provinces, attributes: ['name_en'], include: [
-                        {model: Countries, attributes: ['name_en']}
-                    ]
-                },
-            ]
-        }]
+                model: Directions, where: {name_en: data.parent_name}, include: [
+                    {
+                        model: Provinces, attributes: ['name_en'], include: [
+                            {model: Countries, attributes: ['name_en']}
+                        ]
+                    },
+                ]
+            }]
     }), res);
 
     if (result) {
@@ -168,7 +168,7 @@ exports.update = async (req, res) => {
  * @param res
  * @param d
  */
-exports.saveLocationInfo = (data, res, d) => {
+exports.saveLocationInfo = async(data, res, d) => {
     let cat_ids = data.category_ids.split(',').filter(n => n);
     let dt = {};
 
@@ -176,25 +176,28 @@ exports.saveLocationInfo = (data, res, d) => {
         d.id = data.id;
     }
 
-    // Clearing categories and locations relation for the current location
-    LocCats.destroy({where: {location_id: d.id}}).then(() => {
-        let counter = 0;
-        cat_ids.map(cat_id => {
+    // Processing each category id
+    let counter = 0;
+
+    // Clearing categories and locations relation for the current location and category
+    await to(LocCats.destroy({where: {location_id: d.id}}));
+
+    cat_ids.map((cat_id) => {
 
 
-            dt.category_id = cat_id;  // this because of different data from ng-select .value || cat_id.id
-            dt.location_id = d.id;
+        dt.category_id = cat_id;
+        dt.location_id = d.id;
 
-            // Creating new relations for the current location
-            LocCats.create(dt).then(() => {
-                ++counter;
-                if (counter === cat_ids.length) {
-                    data.save = 1;
-                    this.get(data, res, true)
-                }
-            });
-        })
+        // Creating new relations for the current location
+        LocCats.create(dt).then(() => {
+            ++counter;
+            if (counter === cat_ids.length) {
+                data.save = 1;
+                this.get(data, res, true)
+            }
+        });
     })
+
 };
 
 
