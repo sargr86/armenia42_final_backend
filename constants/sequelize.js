@@ -8,3 +8,6 @@ global.Provinces = db.provinces;
 global.Directions = db.directions;
 global.Locations = db.locations;
 global.Stories = db.stories;
+global.Categories = db.loc_categories;
+global.LocCats = db.loc_cats;
+global.Op = sequelize.Op;

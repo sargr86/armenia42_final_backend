@@ -5,11 +5,19 @@
  * @returns {Promise<void>}
  */
 exports.get = async (req, res) => {
-    let data = req.query;
+    let data = 'save' in req ? req : req.query;
     let lang = data.lang;
+
     let result = await to(Locations.findAll({
         attributes: ['id', 'name_en', `name_${lang}`],
-        include: [{
+        include: [
+            {
+                model: Categories,
+                attributes: ['id', ['name_' + data.lang, 'label']],
+                through: {attributes: []},
+                required: false
+            },
+            {
             model: Directions, where: {name_en: data.parent_name}, include: [
                 {
                     model: Provinces, attributes: ['name_en'], include: [
@@ -43,7 +51,15 @@ exports.getByName = async (req, res) => {
             where: sequelize.where(sequelize.col('direction.name_en'), cleanString(data.parent_name))
         },
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img'],
-        include: [{
+        include: [
+
+            {
+                model: Categories,
+                attributes: [['id','value'], ['name_' + data.lang, 'label']],
+                through: {attributes: []},
+                required: false
+            },
+            {
             model: Directions, where: {name_en: data.parent_name}, include: [
                 {
                     model: Provinces, attributes: ['name_en'], include: [
@@ -92,7 +108,13 @@ exports.add = async (req, res) => {
                 data.direction_id = direction['id'];
                 // Adding the country data to db
                 let result = await to(Locations.create({...data, ...names, ...descriptions}), res);
-                res.json(result);
+
+                this.saveLocationInfo(data, res, result);
+
+                if (!res.headersSent) {
+
+                    res.json(result);
+                }
             }
             else {
                 res.status(500).json('direction_not_found')
@@ -109,6 +131,7 @@ exports.add = async (req, res) => {
  */
 exports.update = async (req, res) => {
     let data = req.body;
+    let originalReq = req;
     uploadFlag(req, res, async (err) => {
 
         if (!hasValidationErrors(req, res, err)) {
@@ -128,13 +151,62 @@ exports.update = async (req, res) => {
                 let {id, ...details} = data;
 
                 let result = await to(Locations.update(details, {where: {id: data.id}}));
-                res.json(result)
+
+                // let data = {id: req.body.id};
+                this.saveLocationInfo(data, res, result);
+
+                // res.json(result)
             }
 
         }
     })
 };
 
+
+/**
+ * Saves location categories info
+ * @param data
+ * @param res
+ * @param d
+ */
+exports.saveLocationInfo = (data, res, d) => {
+    console.log(data)
+    let cat_ids = data.category_ids.split(',').filter(n => n);
+    let dt = {};
+
+    if ('id' in data) {
+        d.id = data.id;
+    }
+
+    // Clearing categories and locations relation for the current location
+    LocCats.destroy({where: {location_id: d.id}}).then(() => {
+        let counter = 0;
+        cat_ids.map(cat_id => {
+
+
+            dt.category_id = cat_id;  // this because of different data from ng-select .value || cat_id.id
+            dt.location_id = d.id;
+
+            // Creating new relations for the current location
+            LocCats.create(dt).then(() => {
+                ++counter;
+                if (counter === cat_ids.length) {
+                    console.log(data)
+                    data.save = 1;
+                    this.get(data, res, true)
+                }
+            });
+        })
+    })
+};
+
+
+/**
+ * Removes a location
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 exports.remove = async (req, res) => {
     let data = req.query;
     let withFolder = data.with_folder;

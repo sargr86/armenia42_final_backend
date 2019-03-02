@@ -14,6 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     locations.associate = function (models) {
         // associations can be defined here
         locations.belongsTo(models.directions);
+        locations.belongsToMany(models.loc_categories, {
+            through: models.loc_cats,
+            foreignKey: 'location_id',
+            targetKey: 'id'
+        }, {underscored: true});
     };
     return locations;
 };

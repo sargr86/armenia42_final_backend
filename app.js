@@ -22,6 +22,7 @@ app.use('/provinces', require('./routes/provinces'));
 app.use('/directions', require('./routes/directions'));
 app.use('/locations', require('./routes/locations'));
 app.use('/stories', require('./routes/stories'));
+app.use('/categories', require('./routes/categories'));
 
 app.use((err, req, res, next) => {
     if (err.code === 'LIMIT_FILE_SIZE') {
