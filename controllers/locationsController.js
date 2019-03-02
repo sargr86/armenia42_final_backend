@@ -106,6 +106,7 @@ exports.add = async (req, res) => {
             // If retrieved adding the province to it, otherwise throwing an error
             if (direction && direction['id']) {
                 data.direction_id = direction['id'];
+
                 // Adding the country data to db
                 let result = await to(Locations.create({...data, ...names, ...descriptions}), res);
 
@@ -117,7 +118,7 @@ exports.add = async (req, res) => {
                 }
             }
             else {
-                res.status(500).json('direction_not_found')
+                res.status(500).json('direction_not_found_error')
             }
         }
     })
@@ -131,7 +132,6 @@ exports.add = async (req, res) => {
  */
 exports.update = async (req, res) => {
     let data = req.body;
-    let originalReq = req;
     uploadFlag(req, res, async (err) => {
 
         if (!hasValidationErrors(req, res, err)) {
@@ -155,7 +155,6 @@ exports.update = async (req, res) => {
                 // let data = {id: req.body.id};
                 this.saveLocationInfo(data, res, result);
 
-                // res.json(result)
             }
 
         }
@@ -170,7 +169,6 @@ exports.update = async (req, res) => {
  * @param d
  */
 exports.saveLocationInfo = (data, res, d) => {
-    console.log(data)
     let cat_ids = data.category_ids.split(',').filter(n => n);
     let dt = {};
 
@@ -191,7 +189,6 @@ exports.saveLocationInfo = (data, res, d) => {
             LocCats.create(dt).then(() => {
                 ++counter;
                 if (counter === cat_ids.length) {
-                    console.log(data)
                     data.save = 1;
                     this.get(data, res, true)
                 }
@@ -220,8 +217,9 @@ exports.remove = async (req, res) => {
     }
 
     // Removing country data if there is no error previously
-    if (!req.headersSent) {
+    if (!res.headersSent) {
         let result = await to(Locations.destroy({where: {id: data.id}}));
+        await to(LocCats.destroy({where: {location_id: data.id}}))
         res.json(result);
     }
 };

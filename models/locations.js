@@ -9,8 +9,8 @@ module.exports = (sequelize, DataTypes) => {
         description_en: DataTypes.TEXT,
         description_ru: DataTypes.TEXT,
         description_hy: DataTypes.TEXT,
-        flag_img:DataTypes.STRING
-    }, {underscored: true,timestamps:false});
+        flag_img: DataTypes.STRING
+    }, {underscored: true, timestamps: false});
     locations.associate = function (models) {
         // associations can be defined here
         locations.belongsTo(models.directions);
@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: 'location_id',
             targetKey: 'id'
         }, {underscored: true});
+        locations.hasMany(models.stories, {foreignKey: "location_id"});
     };
     return locations;
 };

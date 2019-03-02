@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {underscored: true});
     stories.associate = function (models) {
         // associations can be defined here
-        stories.belongsTo(models.locations, {foreignKey: "id"});
+        stories.belongsTo(models.locations, {foreignKey: "location_id"});
     };
     return stories;
 };

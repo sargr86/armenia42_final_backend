@@ -51,7 +51,7 @@ exports.getByName = async (req, res) => {
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`],
         include: [
             {
-                model: Locations, include: [
+                model: Locations, attributes:['name_en'], include: [
                     {
                         model: Directions, include: [
                             {
