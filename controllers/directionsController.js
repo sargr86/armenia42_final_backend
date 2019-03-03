@@ -89,7 +89,7 @@ exports.add = async (req, res) => {
                 res.json(result);
             }
             else {
-                res.status(500).json('province_not_found')
+                res.status(500).json('province_not_found_error')
             }
         }
     })

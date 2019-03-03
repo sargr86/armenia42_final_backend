@@ -4,7 +4,7 @@ const validateProvinceData = require('../validators/validateProvinceData');
 
 router.get('/get',storiesController.get);
 router.post('/add',uploadStoryImgs,storiesController.add);
-router.get('/get-by-name', storiesController.getByName);
+router.get('/get-by-id', storiesController.getById);
 router.put('/update',uploadStoryImgs, storiesController.update);
 router.delete('/remove', storiesController.remove);
 

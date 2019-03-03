@@ -1,3 +1,5 @@
+const imagesController = require('./imagesController');
+
 /**
  * Gets stories list
  * @param req
@@ -7,9 +9,14 @@
 exports.get = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
+    let userAttributes = [];
+    userAttributes.push(fullName(`first_name_${lang}`, `last_name_${lang}`));
     let result = await to(Stories.findAll({
         attributes: ['id', 'name_en', `name_${lang}`],
         include: [
+            {
+                model: Users, attributes: userAttributes
+            },
             {
                 model: Locations, include: [
                     {
@@ -38,20 +45,20 @@ exports.get = async (req, res) => {
  * @param res
  * @returns {Promise<void>}
  */
-exports.getByName = async (req, res) => {
+exports.getById = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
 
     let result = await to(Stories.findOne({
 
         where: {
-            name_en: cleanString(data.name_en, true),
+            id:data.id,
             where: sequelize.where(sequelize.col('location.name_en'), cleanString(data.parent_name, true))
         },
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`],
         include: [
             {
-                model: Locations, attributes:['name_en'], include: [
+                model: Locations, attributes: ['name_en'], include: [
                     {
                         model: Directions, include: [
                             {
@@ -105,12 +112,18 @@ exports.add = async (req, res) => {
             // If retrieved adding the province to it, otherwise throwing an error
             if (location && location['id']) {
                 data.location_id = location['id'];
+                console.log(data)
                 // Adding the country data to db
                 let result = await to(Stories.create({...data, ...names, ...descriptions}), res);
-                res.json(result);
+
+                // Adding necessary additional fields for images adding
+                data.story_id = result['id'];
+                data.storyAdding = 1;
+                await imagesController.add(data, res)
+                // res.json(result);
             }
             else {
-                res.status(500).json('location_not_found')
+                res.status(500).json('location_not_found_error')
             }
         }
     })

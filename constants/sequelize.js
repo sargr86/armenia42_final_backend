@@ -10,4 +10,5 @@ global.Locations = db.locations;
 global.Stories = db.stories;
 global.Categories = db.loc_categories;
 global.LocCats = db.loc_cats;
+global.Images = db.images;
 global.Op = sequelize.Op;
