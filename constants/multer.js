@@ -1,12 +1,9 @@
-
-
-
 // Multer stuff
 global.multer = require('multer');
-global.UPLOAD_MAX_FILE_SIZE = 1024*1024;
+global.UPLOAD_MAX_FILE_SIZE = 1024 * 1024;
 
 let storage = multer.diskStorage({
-    destination: async (req, file, cb)=>{
+    destination: async (req, file, cb) => {
 
         let data = req.body;
         let lang = data.lang;
@@ -14,13 +11,13 @@ let storage = multer.diskStorage({
 
 
         // Getting the translations of a name fields passed in request
-        if('email' in data){
+        if ('email' in data) {
             folderPath = USERS_UPLOAD_FOLDER
         }
         else {
 
             // Update case
-            if('id' in data){
+            if ('id' in data) {
                 console.log(data)
                 folderPath += data.folder;
             }
@@ -29,7 +26,7 @@ let storage = multer.diskStorage({
             else {
 
                 let names = await translateHelper(data['name_' + lang], lang, 'name');
-                folderPath += folderName(data['folder']+'/'+names['name_en'])
+                folderPath += folderName(data['folder'] + '/' + names['name_en'])
             }
 
 
@@ -46,7 +43,7 @@ let storage = multer.diskStorage({
 
 let upload = multer({
     storage: storage,
-    limits:{fileSize:UPLOAD_MAX_FILE_SIZE},
+    limits: {fileSize: UPLOAD_MAX_FILE_SIZE},
     fileFilter: function (req, file, cb) {
 
         let filetypes = /jpeg|jpg/;
@@ -56,11 +53,12 @@ let upload = multer({
 
         if (!mimetype && !extname) {
             req.fileTypeError = "invalid_file_type";
-            return cb(null, false,req.fileTypeError)
+            return cb(null, false, req.fileTypeError)
         }
         cb(null, true);
     }
 });
 global.uploadProfileImg = upload.single('profile_img_file');
 global.uploadFlag = upload.single('flag_file');
+global.uploadStoryImgs = upload.array('story_img_files', STORY_UPLOADS_MAX_COUNT);
 
