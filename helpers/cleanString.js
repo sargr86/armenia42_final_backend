@@ -7,7 +7,7 @@ module.exports = (str, folder2Name = false) => {
     }
     else {
 
-        res = str.replace(/[|_&;:$%@"<>()+,]/g, "");
+        res = str.replace(/[|_&;:$%@"<>()+,]/g, " ");
     }
     return res;
 };

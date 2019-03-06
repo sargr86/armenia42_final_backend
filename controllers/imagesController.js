@@ -9,7 +9,7 @@ exports.get = async (req, res) => {
     let lang = data.lang;
     let result = await to(Images.findAll({
         // attributes:['id','country_id','province_id','direction_id','location_id','story_id','name'],
-        attributes: [['name', 'big'], ['name', 'medium'], ['name', 'small'], 'id', ['description_' + data.lang, 'description'], 'cover', 'fav'],
+        attributes: [['name', 'big'], ['name', 'medium'], ['name', 'small'], 'id', ['description_' + lang, 'description'], 'cover', 'fav'],
         where: {story_id: data.story_id}
     }));
 
