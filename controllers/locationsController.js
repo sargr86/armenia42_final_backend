@@ -62,10 +62,10 @@ exports.getByName = async (req, res) => {
             },
             {
                 model: Directions, where: {name_en: data.parent_name},
-                attributes:['name_en',`name_${lang}`,'province_id'],include: [
+                attributes:['name_en', 'name_ru', 'name_hy','province_id'],include: [
                     {
-                        model: Provinces, attributes:['name_en',`name_${lang}`], include: [
-                            {model: Countries, attributes:['name_en',`name_${lang}`]}
+                        model: Provinces, attributes:['name_en', 'name_ru', 'name_hy'], include: [
+                            {model: Countries, attributes:['name_en', 'name_ru', 'name_hy']}
                         ]
                     },
                 ]

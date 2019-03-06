@@ -41,8 +41,8 @@ exports.getByName = async (req, res) => {
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img'],
         include: [
             {
-                model: Provinces, attributes: ['name_en',`name_${lang}`], include: [
-                    {model: Countries, attributes: ['name_en',`name_${lang}`]}
+                model: Provinces, attributes: ['name_en', 'name_ru', 'name_hy'], include: [
+                    {model: Countries, attributes: ['name_en', 'name_ru', 'name_hy']}
                 ]
             }
         ]

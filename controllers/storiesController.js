@@ -58,12 +58,12 @@ exports.getById = async (req, res) => {
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`],
         include: [
             {
-                model: Locations, attributes:['name_en',`name_${lang}`], include: [
+                model: Locations, attributes:['name_en', 'name_ru', 'name_hy'], include: [
                     {
-                        model: Directions,attributes:['name_en',`name_${lang}`], include: [
+                        model: Directions,attributes:['name_en', 'name_ru', 'name_hy'], include: [
                             {
-                                model: Provinces, attributes:['name_en',`name_${lang}`], include: [
-                                    {model: Countries, attributes:['name_en',`name_${lang}`]}
+                                model: Provinces, attributes:['name_en', 'name_ru', 'name_hy'], include: [
+                                    {model: Countries, attributes:['name_en', 'name_ru', 'name_hy']}
                                 ]
                             },
                         ]
