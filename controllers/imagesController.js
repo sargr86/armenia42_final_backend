@@ -4,13 +4,13 @@
  * @param res
  * @returns {Promise<void>}
  */
-exports.get = async(req,res) =>{
+exports.get = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
     let result = await to(Images.findAll({
         // attributes:['id','country_id','province_id','direction_id','location_id','story_id','name'],
-        attributes: [['name', 'big'], ['name', 'medium'], ['name', 'small'], 'id', ['description_' + data.lang, 'description'],'cover','fav'],
-        where:{story_id:data.story_id}
+        attributes: [['name', 'big'], ['name', 'medium'], ['name', 'small'], 'id', ['description_' + data.lang, 'description'], 'cover', 'fav'],
+        where: {story_id: data.story_id}
     }));
 
     res.json(result);
@@ -24,6 +24,7 @@ exports.get = async(req,res) =>{
  * @returns {Promise<void>}
  */
 exports.add = async (req, res) => {
+
     let data;
     if ('storyAdding' in req) {
         data = req;
@@ -44,6 +45,7 @@ exports.add = async (req, res) => {
         }
     });
 
+
     // Grabbing ids from the selected story
     let story = storyRes.toJSON();
     data.location_id = story.location.id;
@@ -53,11 +55,22 @@ exports.add = async (req, res) => {
     data.cover = 0;
     data.fav = 0;
 
-    // Creating record for each image of the story
-    data.story_imgs.map(async(img)=>{
-        data.name = img;
-        await Images.create(data)
-    });
+    if(!data.story_imgs) res.json("OK");
+
+    // Checking if multiple images sent or just one
+    if (data.story_imgs.constructor === Array) {
+        // Creating record for each image of the story
+        data.story_imgs.map(async (img) => {
+            data.name = img;
+            await Images.create(data)
+        });
+    }
+
+    else {
+        data.name = data.story_imgs;
+        await to(Images.create(data));
+    }
+
 
     res.json("OK");
 };

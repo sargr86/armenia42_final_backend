@@ -16,8 +16,8 @@ let storage = multer.diskStorage({
         }
         else {
 
-            // Update case
-            if ('id' in data) {
+            // Update case (handles also images adding to a story)
+            if ('id' in data || 'story_id' in data) {
                 console.log(data)
                 folderPath += data.folder;
             }
