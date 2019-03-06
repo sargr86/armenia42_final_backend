@@ -18,7 +18,8 @@ exports.get = async (req, res) => {
                 required: false
             },
             {
-                model: Directions, where: {name_en: data.parent_name}, include: [
+                model: Directions, where: {name_en: data.parent_name},
+                attributes:['name_en',`name_${lang}`],include: [
                     {
                         model: Provinces, attributes: ['name_en'], include: [
                             {model: Countries, attributes: ['name_en']}
@@ -60,10 +61,11 @@ exports.getByName = async (req, res) => {
                 required: false
             },
             {
-                model: Directions, where: {name_en: data.parent_name}, include: [
+                model: Directions, where: {name_en: data.parent_name},
+                attributes:['name_en',`name_${lang}`,'province_id'],include: [
                     {
-                        model: Provinces, attributes: ['name_en'], include: [
-                            {model: Countries, attributes: ['name_en']}
+                        model: Provinces, attributes:['name_en',`name_${lang}`], include: [
+                            {model: Countries, attributes:['name_en',`name_${lang}`]}
                         ]
                     },
                 ]

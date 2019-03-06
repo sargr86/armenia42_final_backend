@@ -11,7 +11,7 @@ exports.get = async (req, res) => {
         attributes: ['id', 'name_en', `name_${lang}`],
         include: [
             {
-                model: Provinces, where: {name_en: data.parent_name}, include: [
+                model: Provinces, where: {name_en:  cleanString(data.parent_name,true)}, include: [
                     {model: Countries}
                 ]
             },
@@ -35,14 +35,14 @@ exports.getByName = async (req, res) => {
     let result = await to(Directions.findOne({
 
         where: {
-            name_en: cleanString(data.name_en),
+            name_en: cleanString(data.name_en,true),
             where: sequelize.where(sequelize.col('province.name_en'), cleanString(data.parent_name))
         },
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img'],
         include: [
             {
-                model: Provinces, attributes: ['name_en'], include: [
-                    {model: Countries, attributes: ['name_en']}
+                model: Provinces, attributes: ['name_en',`name_${lang}`], include: [
+                    {model: Countries, attributes: ['name_en',`name_${lang}`]}
                 ]
             }
         ]

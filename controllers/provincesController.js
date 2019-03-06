@@ -66,9 +66,9 @@ exports.getProvinceByName = async (req, res) => {
     let lang = data.lang;
 
     let result = await to(Provinces.findOne({
-        where: {name_en: cleanString(data.name_en)},
+        where: {name_en: cleanString(data.name_en,true)},
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`,'flag_img'],
-        include: [{model: Countries, attributes: ['name_en']}]
+        include: [{model: Countries, attributes: ['name_en',`name_${lang}`]}]
     }), res);
 
     if (result) {
