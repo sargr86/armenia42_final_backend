@@ -18,9 +18,9 @@ exports.get = async (req, res) => {
                 model: Users, attributes: userAttributes
             },
             {
-                model: Locations, include: [
+                model: Locations, where: {name_en: data.parent_name},include: [
                     {
-                        model: Directions, where: {name_en: data.parent_name}, include: [
+                        model: Directions, include: [
                             {
                                 model: Provinces, attributes: ['name_en'], include: [
                                     {model: Countries, attributes: ['name_en']}
@@ -52,18 +52,18 @@ exports.getById = async (req, res) => {
     let result = await to(Stories.findOne({
 
         where: {
-            id:data.id,
-            where: sequelize.where(sequelize.col('location.name_en'), cleanString(data.parent_name, true))
+            id: data.story,
+            where: sequelize.where(sequelize.col('location.name_en'), cleanString(data.location, true))
         },
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`],
         include: [
             {
-                model: Locations, attributes:['name_en', 'name_ru', 'name_hy'], include: [
+                model: Locations, attributes: ['name_en', 'name_ru', 'name_hy'], include: [
                     {
-                        model: Directions,attributes:['name_en', 'name_ru', 'name_hy'], include: [
+                        model: Directions, attributes: ['name_en', 'name_ru', 'name_hy'], include: [
                             {
-                                model: Provinces, attributes:['name_en', 'name_ru', 'name_hy'], include: [
-                                    {model: Countries, attributes:['name_en', 'name_ru', 'name_hy']}
+                                model: Provinces, attributes: ['name_en', 'name_ru', 'name_hy'], include: [
+                                    {model: Countries, attributes: ['name_en', 'name_ru', 'name_hy']}
                                 ]
                             },
                         ]
@@ -182,7 +182,7 @@ exports.remove = async (req, res) => {
     }
 
     // Removing country data if there is no error previously
-    if (!req.headersSent) {
+    if (!res.headersSent) {
         let result = await to(Stories.destroy({where: {id: data.id}}));
         res.json(result);
     }

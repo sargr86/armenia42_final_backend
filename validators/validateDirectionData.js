@@ -8,7 +8,7 @@ const rules = [
         if (!('id' in req)) {
 
             // Retrieving a user with request email
-            let province = await Provinces.findOne({
+            let province = await Directions.findOne({
                 where: {
                     $or: [
                         {name_en: req['name_' + lang]},
@@ -17,19 +17,19 @@ const rules = [
                     ]
                 },
                 include:{
-                    model: Countries, where:{  name_en: req.parent_name}
+                    model: Provinces, where:{  name_en: req.parent_name}
                 }
 
             });
             // Checking province email exists
-            if (province != null) throw new Error('province_exists_error');
+            if (province != null) throw new Error('direction_exists_error');
 
         }
 
 
         // Checking if user wrote province name
         if (req['name_' + lang] === '') {
-            throw new Error('province_name_required_error')
+            throw new Error('direction_name_required_error')
         }
 
 

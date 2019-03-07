@@ -35,8 +35,8 @@ exports.getByName = async (req, res) => {
     let result = await to(Directions.findOne({
 
         where: {
-            name_en: cleanString(data.name_en,true),
-            where: sequelize.where(sequelize.col('province.name_en'), cleanString(data.parent_name))
+            name_en: cleanString(data.direction,true),
+            where: sequelize.where(sequelize.col('province.name_en'), cleanString(data.province))
         },
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img'],
         include: [

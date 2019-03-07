@@ -48,8 +48,8 @@ exports.getByName = async (req, res) => {
     let result = await to(Locations.findOne({
 
         where: {
-            name_en: cleanString(data.name_en),
-            where: sequelize.where(sequelize.col('direction.name_en'), cleanString(data.parent_name))
+            name_en: cleanString(data.location),
+            where: sequelize.where(sequelize.col('direction.name_en'), cleanString(data.direction))
         },
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img'],
         include: [
@@ -61,7 +61,7 @@ exports.getByName = async (req, res) => {
                 required: false
             },
             {
-                model: Directions, where: {name_en: data.parent_name},
+                model: Directions, where: {name_en: data.direction},
                 attributes:['name_en', 'name_ru', 'name_hy','province_id'],include: [
                     {
                         model: Provinces, attributes:['name_en', 'name_ru', 'name_hy'], include: [

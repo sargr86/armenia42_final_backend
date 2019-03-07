@@ -8,4 +8,5 @@ global.removeFolder = require('../helpers/removeFolder');
 global.renameFolder = require('../helpers/renameFolder');
 global.compareFolders = require('../helpers/compareFolders');
 global.hasValidationErrors = require('../helpers/hasValidationErrors');
-global.folderUrl = require('../helpers/folderUrl')
+global.folderUrl = require('../helpers/folderUrl');
+global.nameAttr = require('../helpers/nameAttributes');
