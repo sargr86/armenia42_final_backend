@@ -55,15 +55,17 @@ exports.add = async (req, res) => {
     data.cover = 0;
     data.fav = 0;
 
-    if(!data.story_imgs) res.json("OK");
+    if (!data.story_imgs) res.json("OK");
 
     // Checking if multiple images sent or just one
     if (data.story_imgs && data.story_imgs.constructor === Array) {
         // Creating record for each image of the story
-        data.story_imgs.map(async (img) => {
+       let list =  data.story_imgs.map(async (img) => {
             data.name = img;
             await Images.create(data)
         });
+
+        const results = await Promise.all(list);
     }
 
     else {
@@ -72,5 +74,8 @@ exports.add = async (req, res) => {
     }
 
 
-    res.json("OK");
+    if (!res.headersSent) {
+
+        res.json("OK");
+    }
 };

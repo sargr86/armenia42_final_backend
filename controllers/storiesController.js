@@ -18,7 +18,7 @@ exports.get = async (req, res) => {
                 model: Users, attributes: userAttributes
             },
             {
-                model: Locations, where: {name_en: data.parent_name},include: [
+                model: Locations, where: {name_en: cleanString(data.parent_name, true)}, include: [
                     {
                         model: Directions, include: [
                             {
@@ -119,8 +119,15 @@ exports.add = async (req, res) => {
                 // Adding necessary additional fields for images adding
                 data.story_id = result['id'];
                 data.storyAdding = 1;
-                await imagesController.add(data, res)
-                // res.json(result);
+
+                if (data.story_imgs) {
+
+                    await imagesController.add(data, res)
+                }
+                else {
+
+                    res.json(result);
+                }
             }
             else {
                 res.status(500).json('location_not_found_error')
