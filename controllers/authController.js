@@ -147,7 +147,7 @@ exports.updateProfile = async (req, res) => {
             // Cloning user object without id and language to build update fields
             let {id, lang, ...fields} = data;
 
-            let result = await to(Users.update(fields, {where: {id: data.id}}), res)
+            let result = await to(Users.update(fields, {where: {id: data.id}}), res);
             res.json(result)
         }
     })

@@ -60,7 +60,7 @@ exports.add = async (req, res) => {
     // Checking if multiple images sent or just one
     if (data.story_imgs && data.story_imgs.constructor === Array) {
         // Creating record for each image of the story
-       let list =  data.story_imgs.map(async (img) => {
+        let list = data.story_imgs.map(async (img) => {
             data.name = img;
             await Images.create(data)
         });
@@ -78,4 +78,64 @@ exports.add = async (req, res) => {
 
         res.json("OK");
     }
+};
+
+/**
+ * Gets an image info by its id
+ * @param req
+ * @param res
+ */
+exports.getById = async (req, res) => {
+    let data = req.query;
+    let lang = data.lang;
+    let result = await to(Images.findOne(
+        {
+            where: {id: data.id},
+            attributes: ['id', 'name', `description_${lang}`, 'cover', 'fav'],
+            include: [
+                {
+                    model: Stories, include: [
+                        {
+                            model: Locations, attributes: ['name_en', 'name_ru', 'name_hy'], include: [
+                                {
+                                    model: Directions, attributes: ['name_en', 'name_ru', 'name_hy'], include: [
+                                        {
+                                            model: Provinces, attributes: ['name_en', 'name_ru', 'name_hy'], include: [
+                                                {model: Countries, attributes: ['name_en', 'name_ru', 'name_hy']}
+                                            ]
+                                        },
+                                    ]
+                                }
+
+                            ]
+                        }
+                    ]
+                }
+
+
+            ],
+        }
+    ));
+
+
+    if (result) {
+        result = result.get({plain: true});
+        result['folder'] = folderUrl(result);
+        result['parent_name'] = result['name_en'];
+    }
+
+    res.json(result);
+};
+
+/**
+ * Update an image info
+ * @param req
+ * @param res
+ */
+exports.updateInfo = async (req, res) => {
+    let data = req.body;
+
+    let {id, lang, ...fields} = data;
+    let result = await  to(Images.update(fields, {where: {id: data.id}}), res);
+    res.json(result)
 };

@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         // associations can be defined here
         stories.belongsTo(models.locations, {foreignKey: "location_id"});
         stories.belongsTo(models.users, {foreignKey: "user_id"});
+        stories.hasMany(models.images, {foreignKey: "story_id"});
     };
     return stories;
 };
