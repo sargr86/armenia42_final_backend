@@ -5,6 +5,7 @@ global.cleanString = require('../helpers/cleanString');
 global.folderName  = require('../helpers/folderName');
 global.createFolder = require('../helpers/createFolder');
 global.removeFolder = require('../helpers/removeFolder');
+global.removeFile = require('../helpers/removeFile');
 global.renameFolder = require('../helpers/renameFolder');
 global.compareFolders = require('../helpers/compareFolders');
 global.hasValidationErrors = require('../helpers/hasValidationErrors');

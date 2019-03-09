@@ -91,7 +91,7 @@ exports.getById = async (req, res) => {
     let result = await to(Images.findOne(
         {
             where: {id: data.id},
-            attributes: ['id', 'name', `description_${lang}`, 'cover', 'fav'],
+            attributes: ['id', 'name', `description_${lang}`, 'cover', 'fav', 'country_id', 'province_id', 'direction_id', 'location_id'],
             include: [
                 {
                     model: Stories, include: [
@@ -120,7 +120,7 @@ exports.getById = async (req, res) => {
 
     if (result) {
         result = result.get({plain: true});
-        result['folder'] = folderUrl(result);
+        result['file'] = folderUrl(result);
         result['parent_name'] = result['name_en'];
     }
 
@@ -134,8 +134,47 @@ exports.getById = async (req, res) => {
  */
 exports.updateInfo = async (req, res) => {
     let data = req.body;
+    let translate = +data.translate;
+    let coverItem = data['coverItem'];
 
+    // Extracting update fields from the request data
     let {id, lang, ...fields} = data;
+
+    // if translate flag is enabled, getting translated names of stories and appending to the request
+    if (translate) {
+
+        let descFields = await translateHelper(data['description_' + lang], lang, 'description');
+        fields = {...data, ...descFields};
+
+    }
+
+    // If image is set as cover for an *item, updating the corresponding model cover property
+    if (coverItem && data['cover']) {
+        await db[coverItem['model']].update({cover_id: data['id']}, {where: {id: coverItem['value']}})
+    }
+
+
     let result = await  to(Images.update(fields, {where: {id: data.id}}), res);
     res.json(result)
+};
+
+/**
+ * Removes an image from the selected story
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+exports.remove = async (req, res) => {
+    let data = req.query;
+
+    if (data.withFile) {
+        let imageFile = OTHER_UPLOADS_FOLDER + folderName(data['file']);
+
+        let error = await to(removeFile(imageFile), res);
+        if (error) res.status(500).json(error);
+    }
+
+
+    await to(Images.destroy({where: {id: data.id}}));
+    this.get(req, res)
 };
