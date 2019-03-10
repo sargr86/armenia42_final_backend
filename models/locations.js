@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
             targetKey: 'id'
         }, {underscored: true});
         locations.hasMany(models.stories, {foreignKey: "location_id"});
+        locations.hasMany(models.images, {foreignKey: "location_id"});
     };
     return locations;
 };

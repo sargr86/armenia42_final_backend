@@ -51,7 +51,7 @@ exports.getByName = async (req, res) => {
             name_en: cleanString(data.location),
             where: sequelize.where(sequelize.col('direction.name_en'), cleanString(data.direction))
         },
-        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img'],
+        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img','cover_id'],
         include: [
 
             {
@@ -59,6 +59,10 @@ exports.getByName = async (req, res) => {
                 attributes: [['id', 'value'], ['name_' + data.lang, 'label']],
                 through: {attributes: []},
                 required: false
+            },
+            {
+                model: Images, attributes: ['name'], required: false,
+                where: [{where: sequelize.where(sequelize.col('`images`.`id`'), sequelize.col('`locations`.`cover_id`'))}]
             },
             {
                 model: Directions, where: {name_en: data.direction},
@@ -76,6 +80,7 @@ exports.getByName = async (req, res) => {
         result = result.get({plain: true});
         result['folder'] = folderUrl(result);
         result['parent_name'] = result['name_en'];
+        result = getCoverPath(req, result);
     }
 
 

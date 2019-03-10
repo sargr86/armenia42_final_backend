@@ -11,7 +11,7 @@ exports.get = async (req, res) => {
         attributes: ['id', 'name_en', `name_${lang}`],
         include: [
             {
-                model: Provinces, where: {name_en:  cleanString(data.parent_name,true)}, include: [
+                model: Provinces, where: {name_en: cleanString(data.parent_name, true)}, include: [
                     {model: Countries}
                 ]
             },
@@ -31,20 +31,25 @@ exports.get = async (req, res) => {
 exports.getByName = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
+    console.log(data)
 
     let result = await to(Directions.findOne({
-
         where: {
-            name_en: cleanString(data.direction,true),
-            where: sequelize.where(sequelize.col('province.name_en'), cleanString(data.province))
+            name_en: cleanString(data.direction, true)
         },
-        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img'],
+        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img','cover_id'],
         include: [
+
             {
-                model: Provinces, attributes: ['name_en', 'name_ru', 'name_hy'], include: [
+                model: Provinces, where: sequelize.where(sequelize.col('province.name_en'), cleanString(data.province)),
+                attributes: ['name_en', 'name_ru', 'name_hy','country_id'], include: [
                     {model: Countries, attributes: ['name_en', 'name_ru', 'name_hy']}
                 ]
-            }
+            },
+            {
+                model: Images, attributes: ['name'], required: false,
+                where: [{where: sequelize.where(sequelize.col('`images`.`id`'), sequelize.col('`directions`.`cover_id`'))}]
+            },
         ]
     }), res);
 
@@ -52,6 +57,7 @@ exports.getByName = async (req, res) => {
         result = result.get({plain: true});
         result['folder'] = folderUrl(result);
         result['parent_name'] = result['name_en'];
+        result = getCoverPath(req, result);
     }
 
 

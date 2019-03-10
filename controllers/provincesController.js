@@ -44,13 +44,11 @@ exports.getProvinceByName = async (req, res) => {
 
     if (result) {
         result = result.get({plain: true});
-        console.log(result)
         result['folder'] = folderUrl(result);
         result['parent_name'] = result['name_en'];
         result = getCoverPath(req, result);
     }
 
-    // console.log(result)
     res.json(result);
 };
 
