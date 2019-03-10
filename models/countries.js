@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     countries.associate = function (models) {
         // associations can be defined here
         countries.hasMany(models.provinces, {foreignKey: "country_id"});
+        countries.hasMany(models.images, {foreignKey: "country_id"});
 
     };
     return countries;

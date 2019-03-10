@@ -15,6 +15,45 @@ exports.get = async (req, res) => {
     res.json(result)
 };
 
+/**
+ * Gets province by name
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+exports.getProvinceByName = async (req, res) => {
+    let data = req.query;
+    let lang = data.lang;
+
+    let result = await to(Provinces.findOne({
+        where: {name_en: cleanString(data.province, true)},
+        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img','cover_id'],
+        include: [
+            {
+                model: Countries,
+                attributes: ['name_en', 'name_ru', 'name_hy'],
+                where: {name_en: cleanString(data.country, true)}
+            },
+
+            {
+                model: Images, attributes: ['name'], required: false,
+                where: [{where: sequelize.where(sequelize.col('`images`.`id`'), sequelize.col('`provinces`.`cover_id`'))}]
+            },
+        ],
+    }), res);
+
+    if (result) {
+        result = result.get({plain: true});
+        console.log(result)
+        result['folder'] = folderUrl(result);
+        result['parent_name'] = result['name_en'];
+        result = getCoverPath(req, result);
+    }
+
+    // console.log(result)
+    res.json(result);
+};
+
 
 /**
  * Adds a new province to the selected country
@@ -55,32 +94,6 @@ exports.add = async (req, res) => {
 
 };
 
-/**
- * Gets province by name
- * @param req
- * @param res
- * @returns {Promise<void>}
- */
-exports.getProvinceByName = async (req, res) => {
-    let data = req.query;
-    let lang = data.lang;
-
-    let result = await to(Provinces.findOne({
-        where: {name_en: cleanString(data.province,true)},
-        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`,'flag_img'],
-        include: [{model: Countries, attributes: ['name_en', 'name_ru', 'name_hy'],
-            where:{name_en: cleanString(data.country,true)}}]
-    }), res);
-
-    if (result) {
-        result = result.get({plain: true});
-        result['folder'] = folderUrl(result);
-        result['parent_name'] = result['name_en'];
-    }
-
-
-    res.json(result);
-};
 
 /**
  * Updates province info

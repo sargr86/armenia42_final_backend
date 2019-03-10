@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     provinces.associate = function (models) {
         // associations can be defined here
         provinces.belongsTo(models.countries, {foreignKey: "country_id"});
+        provinces.hasMany(models.images, {foreignKey: "province_id"});
     };
     return provinces;
 };

@@ -37,7 +37,7 @@ exports.add = async (req, res) => {
             fse.ensureDir(OTHER_UPLOADS_FOLDER + folderName(names['name_en']));
 
             // Adding the country data to db
-            let result = await to(Countries.create({...data, ...names,...descriptions}), res);
+            let result = await to(Countries.create({...data, ...names, ...descriptions}), res);
             res.json(result);
         }
     })
@@ -55,13 +55,20 @@ exports.getCountryByName = async (req, res) => {
 
     let result = await to(Countries.findOne({
         where: {name_en: cleanString(data.name_en)},
-        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img']
+        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img', 'cover_id'],
+        include: [
+            {
+                model: Images, attributes: ['name'], required: false,
+                where: [{where: sequelize.where(sequelize.col('`images`.`id`'), sequelize.col('`countries`.`cover_id`'))}]
+            }
+        ],
     }), res);
 
     if (result) {
         result = result.get({plain: true});
         result['folder'] = folderUrl(result);
         result['parent_name'] = result['name_en'];
+        result =  getCoverPath(req, result);
     }
 
     res.json(result);
