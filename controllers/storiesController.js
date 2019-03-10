@@ -55,7 +55,7 @@ exports.getById = async (req, res) => {
             id: data.story,
             where: sequelize.where(sequelize.col('location.name_en'), cleanString(data.location, true))
         },
-        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`],
+        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`,'user_id'], // user_id needed for breadcrumb((
         include: [
             {
                 model: Locations, attributes: ['name_en', 'name_ru', 'name_hy'], include: [

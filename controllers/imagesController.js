@@ -134,6 +134,7 @@ exports.getById = async (req, res) => {
  */
 exports.updateInfo = async (req, res) => {
     let data = req.body;
+    let image_id = data.id;
     let translate = +data.translate;
     let coverItem = data['coverItem'];
 
@@ -150,11 +151,13 @@ exports.updateInfo = async (req, res) => {
 
     // If image is set as cover for an *item, updating the corresponding model cover property
     if (coverItem && data['cover']) {
-        await db[coverItem['model']].update({cover_id: data['id']}, {where: {id: coverItem['value']}})
+        console.log(data)
+        console.log(image_id)
+        await db[coverItem['model']].update({cover_id: image_id}, {where: {id: coverItem['value']}})
     }
 
 
-    let result = await  to(Images.update(fields, {where: {id: data.id}}), res);
+    let result = await  to(Images.update(fields, {where: {id: image_id}}), res);
     res.json(result)
 };
 
