@@ -8,6 +8,13 @@ module.exports = {
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },
+            country_id: {
+                type: Sequelize.INTEGER
+            },
+            province_id: {
+                type: Sequelize.INTEGER
+            },
+
             direction_id: {
                 type: Sequelize.INTEGER
             },

@@ -7,6 +7,14 @@
 exports.get = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
+    let cat_id = data.cat_id;
+    let where;
+
+    // Appending category condition to the query
+    if (cat_id) {
+        where = sequelize.where(sequelize.col('locations->loc_categories->loc_cats.category_id'), cat_id);
+    }
+
     let result = await to(Directions.findAll({
         attributes: ['id', 'name_en', `name_${lang}`],
         include: [
@@ -15,8 +23,13 @@ exports.get = async (req, res) => {
                     {model: Countries}
                 ]
             },
-
+            {
+                model: Locations, attributes: ['name_en'], include: [
+                    {model: Categories, attributes: ['name_en']}
+                ]
+            }
         ],
+        where,
         order: [`name_${lang}`]
     }), res);
     res.json(result)
@@ -31,7 +44,6 @@ exports.get = async (req, res) => {
 exports.getByName = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
-    console.log(data)
 
     let result = await to(Directions.findOne({
         where: {

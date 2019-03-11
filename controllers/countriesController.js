@@ -11,12 +11,29 @@ require('../constants/helpers');
 exports.get = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
+    let cat_id = data.cat_id;
+    let where;
+
+    // Appending category condition to the query
+    if (cat_id) {
+        where = sequelize.where(sequelize.col('locations->loc_categories->loc_cats.category_id'), cat_id);
+    }
+
     let result = await to(Countries.findAll({
         attributes: ['id', 'name_en', `name_${lang}`, 'flag_img'],
-        order: [`name_${lang}`]
+        order: [`name_${lang}`],
+        include: [
+            {
+                model: Locations, attributes: ['name_en'], include: [
+                    {model: Categories, attributes: ['name_en']}
+                ]
+            }
+        ],
+        where
     }), res);
     res.json(result)
 };
+
 
 /**
  * Adds a new country
@@ -58,13 +75,13 @@ exports.getCountryByName = async (req, res) => {
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img', 'cover_id'],
         include: [
             {
-                model: Images, attributes: ['id','name'], required: false,
+                model: Images, attributes: ['id', 'name'], required: false,
                 // where: [{where: sequelize.where(sequelize.col('`images`.`id`'), sequelize.col('`countries`.`cover_id`'))}]
             }
         ],
     }), res);
 
-    let ret = prepareResult(result,req);
+    let ret = prepareResult(result, req);
 
     res.json(ret);
 };

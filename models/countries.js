@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         // associations can be defined here
         countries.hasMany(models.provinces, {foreignKey: "country_id"});
         countries.hasMany(models.images, {foreignKey: "country_id"});
+        countries.hasMany(models.locations, {foreignKey: "country_id"});
 
     };
     return countries;

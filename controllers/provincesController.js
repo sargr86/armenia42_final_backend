@@ -7,9 +7,26 @@
 exports.get = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
+    let cat_id = data.cat_id;
+    let where;
+
+    // Appending category condition to the query
+    if (cat_id) {
+        where = sequelize.where(sequelize.col('locations->loc_categories->loc_cats.category_id'), cat_id);
+    }
+
+
     let result = await to(Provinces.findAll({
         attributes: ['id', 'name_en', `name_${lang}`],
-        include: {model: Countries, where: {name_en: data.parent_name}},
+        include: [
+            {model: Countries, where: {name_en: data.parent_name}},
+            {
+                model: Locations, attributes: ['name_en'], include: [
+                    {model: Categories, attributes: ['name_en']}
+                ]
+            }
+        ],
+        where,
         order: [`name_${lang}`]
     }), res);
     res.json(result)
@@ -27,7 +44,7 @@ exports.getProvinceByName = async (req, res) => {
 
     let result = await to(Provinces.findOne({
         where: {name_en: cleanString(data.province, true)},
-        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img','cover_id'],
+        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img', 'cover_id'],
         include: [
             {
                 model: Countries,
@@ -36,20 +53,13 @@ exports.getProvinceByName = async (req, res) => {
             },
 
             {
-                model: Images, attributes: ['id','name'], required: false,
+                model: Images, attributes: ['id', 'name'], required: false,
                 // where: [{where: sequelize.where(sequelize.col('`images`.`id`'), sequelize.col('`provinces`.`cover_id`'))}]
             },
         ],
     }), res);
 
-    // if (result) {
-    //     result = result.get({plain: true});
-    //     result['folder'] = folderUrl(result);
-    //     result['parent_name'] = result['name_en'];
-    //     result = prepareResult(req, result);
-    // }
-
-    let ret = prepareResult(result,req);
+    let ret = prepareResult(result, req);
 
     res.json(ret);
 };

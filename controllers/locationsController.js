@@ -7,6 +7,13 @@
 exports.get = async (req, res) => {
     let data = 'save' in req ? req : req.query;
     let lang = data.lang;
+    let cat_id = data.cat_id;
+    let where;
+
+    // Appending category condition to the query
+    if (cat_id) {
+        where = sequelize.where(sequelize.col('loc_categories->loc_cats.category_id'), cat_id);
+    }
 
     let result = await to(Locations.findAll({
         attributes: ['id', 'name_en', `name_${lang}`],
@@ -19,7 +26,7 @@ exports.get = async (req, res) => {
             },
             {
                 model: Directions, where: {name_en: data.parent_name},
-                attributes:['name_en',`name_${lang}`],include: [
+                attributes: ['name_en', `name_${lang}`], include: [
                     {
                         model: Provinces, attributes: ['name_en'], include: [
                             {model: Countries, attributes: ['name_en']}
@@ -30,9 +37,13 @@ exports.get = async (req, res) => {
 
 
         ],
+        where,
         order: [`name_${lang}`]
     }), res);
-    res.json(result)
+
+    if (!res.headersSent) {
+        res.json(result)
+    }
 };
 
 /**
@@ -51,7 +62,7 @@ exports.getByName = async (req, res) => {
             name_en: cleanString(data.location),
             where: sequelize.where(sequelize.col('direction.name_en'), cleanString(data.direction))
         },
-        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img','cover_id'],
+        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img', 'cover_id'],
         include: [
 
             {
@@ -61,22 +72,22 @@ exports.getByName = async (req, res) => {
                 required: false
             },
             {
-                model: Images, attributes: ['id','name'], required: false,
+                model: Images, attributes: ['id', 'name'], required: false,
                 where: [{where: sequelize.where(sequelize.col('`images`.`id`'), sequelize.col('`locations`.`cover_id`'))}]
             },
             {
                 model: Directions, where: {name_en: data.direction},
-                attributes:['name_en', 'name_ru', 'name_hy','province_id'],include: [
+                attributes: ['name_en', 'name_ru', 'name_hy', 'province_id'], include: [
                     {
-                        model: Provinces, attributes:['name_en', 'name_ru', 'name_hy'], include: [
-                            {model: Countries, attributes:['name_en', 'name_ru', 'name_hy']}
+                        model: Provinces, attributes: ['name_en', 'name_ru', 'name_hy'], include: [
+                            {model: Countries, attributes: ['name_en', 'name_ru', 'name_hy']}
                         ]
                     },
                 ]
             }]
     }), res);
 
-    let ret = prepareResult(result,req);
+    let ret = prepareResult(result, req);
     res.json(ret);
 };
 
@@ -106,6 +117,23 @@ exports.add = async (req, res) => {
             // If retrieved adding the province to it, otherwise throwing an error
             if (direction && direction['id']) {
                 data.direction_id = direction['id'];
+
+                // Getting the direction with its parents by id
+                let directionRes = await Directions.findOne({
+                    where: {id: direction['id']},
+                    include: [
+                        {
+                            model: Provinces, attributes: ['id'], include: {
+                                model: Countries, attributes: ['id']
+                            }
+                        }
+                    ]
+                });
+
+                // Grabbing ids from the selected story
+                let directionData = directionRes.toJSON();
+                data.province_id = directionData.province.id;
+                data.country_id = directionData.province.country.id;
 
                 // Adding the country data to db
                 let result = await to(Locations.create({...data, ...names, ...descriptions}), res);
@@ -168,7 +196,7 @@ exports.update = async (req, res) => {
  * @param res
  * @param d
  */
-exports.saveLocationInfo = async(data, res, d) => {
+exports.saveLocationInfo = async (data, res, d) => {
     let cat_ids = data.category_ids.split(',').filter(n => n);
     let dt = {};
 
