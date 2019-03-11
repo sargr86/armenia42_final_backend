@@ -5,6 +5,8 @@
  * @returns {Promise<void>}
  */
 exports.get = async (req, res) => {
+
+    // Getting request data
     let data = req.query;
     let lang = data.lang;
     let cat_id = data.cat_id;
