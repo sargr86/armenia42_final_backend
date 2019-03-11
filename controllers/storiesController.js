@@ -19,15 +19,15 @@ exports.get = async (req, res) => {
             },
             {
                 model: Locations, where: {name_en: cleanString(data.parent_name, true)}, include: [
-                    {
-                        model: Directions, include: [
-                            {
-                                model: Provinces, attributes: ['name_en'], include: [
-                                    {model: Countries, attributes: ['name_en']}
-                                ]
-                            },
-                        ]
-                    }
+                    // {
+                    //     model: Directions, include: [
+                    //         {
+                    //             model: Provinces, attributes: ['name_en'], include: [
+                    //                 {model: Countries, attributes: ['name_en']}
+                    //             ]
+                    //         },
+                    //     ]
+                    // }
 
                 ]
             }
@@ -76,14 +76,8 @@ exports.getById = async (req, res) => {
         ],
     }), res);
 
-    if (result) {
-        result = result.get({plain: true});
-        result['folder'] = folderUrl(result);
-        result['parent_name'] = result['name_en'];
-    }
-
-
-    res.json(result);
+    let ret = prepareResult(result,req);
+    res.json(ret);
 };
 
 /**
@@ -112,7 +106,6 @@ exports.add = async (req, res) => {
             // If retrieved adding the province to it, otherwise throwing an error
             if (location && location['id']) {
                 data.location_id = location['id'];
-                console.log(data)
                 // Adding the country data to db
                 let result = await to(Stories.create({...data, ...names, ...descriptions}), res);
 

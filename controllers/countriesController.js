@@ -58,20 +58,15 @@ exports.getCountryByName = async (req, res) => {
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img', 'cover_id'],
         include: [
             {
-                model: Images, attributes: ['name'], required: false,
-                where: [{where: sequelize.where(sequelize.col('`images`.`id`'), sequelize.col('`countries`.`cover_id`'))}]
+                model: Images, attributes: ['id','name'], required: false,
+                // where: [{where: sequelize.where(sequelize.col('`images`.`id`'), sequelize.col('`countries`.`cover_id`'))}]
             }
         ],
     }), res);
 
-    if (result) {
-        result = result.get({plain: true});
-        result['folder'] = folderUrl(result);
-        result['parent_name'] = result['name_en'];
-        result =  getCoverPath(req, result);
-    }
+    let ret = prepareResult(result,req);
 
-    res.json(result);
+    res.json(ret);
 };
 
 /**

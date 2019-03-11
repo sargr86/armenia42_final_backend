@@ -11,5 +11,5 @@ global.compareFolders = require('../helpers/compareFolders');
 global.hasValidationErrors = require('../helpers/hasValidationErrors');
 global.folderUrl = require('../helpers/folderUrl');
 global.nameAttr = require('../helpers/nameAttributes');
-global.getCoverPath = require('../helpers/getCoverPath');
+global.prepareResult = require('../helpers/prepareResult');
 global.searchFileRecursive = require('../helpers/searchFileRecursive');

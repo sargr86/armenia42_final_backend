@@ -61,7 +61,7 @@ exports.getByName = async (req, res) => {
                 required: false
             },
             {
-                model: Images, attributes: ['name'], required: false,
+                model: Images, attributes: ['id','name'], required: false,
                 where: [{where: sequelize.where(sequelize.col('`images`.`id`'), sequelize.col('`locations`.`cover_id`'))}]
             },
             {
@@ -76,15 +76,8 @@ exports.getByName = async (req, res) => {
             }]
     }), res);
 
-    if (result) {
-        result = result.get({plain: true});
-        result['folder'] = folderUrl(result);
-        result['parent_name'] = result['name_en'];
-        result = getCoverPath(req, result);
-    }
-
-
-    res.json(result);
+    let ret = prepareResult(result,req);
+    res.json(ret);
 };
 
 /**
