@@ -89,6 +89,7 @@ exports.getById = async (req, res) => {
 exports.add = async (req, res) => {
     let data = req.body;
     let lang = data.lang;
+
     uploadStoryImgs(req, res, async (err) => {
 
         if (!hasValidationErrors(req, res, err)) {
@@ -112,11 +113,11 @@ exports.add = async (req, res) => {
                 // Adding necessary additional fields for images adding
                 data.story_id = result['id'];
                 data.storyAdding = 1;
-
                 if (data.story_imgs) {
 
                     await imagesController.add(data, res)
                 }
+
                 else {
 
                     res.json(result);
@@ -125,6 +126,11 @@ exports.add = async (req, res) => {
             else {
                 res.status(500).json('location_not_found_error')
             }
+        }
+        // If a file validation is not passed, removing other files in the current queue
+        else {
+
+            handleExistingFiles(data);
         }
     })
 };

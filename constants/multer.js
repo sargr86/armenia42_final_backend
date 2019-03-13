@@ -6,6 +6,7 @@ let storage = multer.diskStorage({
     destination: async (req, file, cb) => {
 
         let folderPath = await getUploadFolder(req.body);
+        fse.ensureDir(folderPath);
         cb(null, folderPath)
 
 
