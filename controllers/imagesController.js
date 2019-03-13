@@ -66,10 +66,10 @@ exports.handleAdding = async (data, res) => {
     let storyRes = await Stories.findOne({
         where: {id: data.story_id},
         include: {
-            model: Locations, attributes: ['id'], include: {
-                model: Directions, attributes: ['id'], include: {
-                    model: Provinces, attributes: ['id'], include: {
-                        model: Countries, attributes: ['id']
+            model: Locations, attributes: ['id','name_en'], include: {
+                model: Directions, attributes: ['id','name_en'], include: {
+                    model: Provinces, attributes: ['id','name_en'], include: {
+                        model: Countries, attributes: ['id','name_en']
                     }
                 }
             }
@@ -85,6 +85,9 @@ exports.handleAdding = async (data, res) => {
     data.country_id = story.location.direction.province.country.id;
     data.cover = 0;
     data.fav = 0;
+    data.folder = folderUrl(story);
+
+    console.log(data)
 
     if (!data.story_imgs) res.json("OK");
 

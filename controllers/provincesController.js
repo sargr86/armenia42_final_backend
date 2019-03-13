@@ -53,17 +53,24 @@ exports.getProvinceByName = async (req, res) => {
                 attributes: ['name_en', 'name_ru', 'name_hy'],
                 where: {name_en: cleanString(data.country, true)}
             },
-
-            {
-                model: Images, attributes: ['id', 'name'], required: false,
-                // where: [{where: sequelize.where(sequelize.col('`images`.`id`'), sequelize.col('`provinces`.`cover_id`'))}]
-            },
         ],
     }), res);
 
     let ret = prepareResult(result, req);
 
     res.json(ret);
+};
+
+
+/**
+ * Gets province images
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+exports.getImages = async (req, res) => {
+    let result = await getItemImages(req,{country_id: req.query.parent_id});
+    res.json(result);
 };
 
 
@@ -105,8 +112,6 @@ exports.add = async (req, res) => {
     })
 
 };
-
-
 /**
  * Updates province info
  * @param req

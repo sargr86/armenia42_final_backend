@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         story_id: DataTypes.INTEGER,
         cover: DataTypes.INTEGER,
         fav: DataTypes.INTEGER,
+        folder: DataTypes.STRING,
         name: DataTypes.STRING,
         description_en: DataTypes.TEXT,
         description_ru: DataTypes.TEXT,
@@ -18,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         images.belongsTo(models.stories, {foreignKey: "story_id"});
         // images.belongsTo(models.countries, {foreignKey: "cover_id"});
         // images.belongsTo(models.directions, {foreignKey: "cover_id"});
+        images.belongsTo(models.locations, {foreignKey: "location_id"});
     };
     return images;
 };

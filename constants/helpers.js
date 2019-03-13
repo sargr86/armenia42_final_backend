@@ -14,4 +14,5 @@ global.nameAttr = require('../helpers/nameAttributes');
 global.prepareResult = require('../helpers/prepareResult');
 global.searchFileRecursive = require('../helpers/searchFileRecursive');
 global.getUploadFolder = require('../helpers/getUploadFolder');
+global.getItemImages = require('../helpers/getItemImages');
 global.handleExistingFiles = require('../helpers/handleExistingFiles');

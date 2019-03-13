@@ -47,6 +47,17 @@ exports.get = async (req, res) => {
 };
 
 /**
+ * Gets location images
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
+exports.getImages = async (req, res) => {
+    let result = await getItemImages(req,{direction_id: req.query.parent_id});
+    res.json(result);
+};
+
+/**
  * Gets a direction by name
  * @param req
  * @param res
