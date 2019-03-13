@@ -29,7 +29,7 @@ exports.add = (req, res) => {
     // Story adding with images case
     if ('storyAdding' in req) {
         data = req;
-        this.handleAdding(data,res)
+        this.handleAdding(data, res)
     }
 
     // Images adding
@@ -39,7 +39,30 @@ exports.add = (req, res) => {
         uploadStoryImgs(req, res, async (err) => {
 
             if (!hasValidationErrors(req, res, err)) {
-                this.handleAdding(data,res)
+                this.handleAdding(data, res)
+            }
+
+            // If a file validation is not passed, removing other files in the current queue
+            else {
+                let folderPath = await getUploadFolder(data);
+                let storyImgs = data.story_imgs;
+
+                if (storyImgs && storyImgs.constructor === Array) {
+
+                    // Getting all the files of current directory and filtering the current queue files
+                    let uploadedQueueImgs = fse.readdirSync(folderPath);
+                    let foundQueueFiles = uploadedQueueImgs.filter(value => storyImgs.includes(value));
+
+                    // Removing only current queue files
+                    foundQueueFiles.map(file => {
+                        let path = folderPath + '/' + file;
+                        if (fse.existsSync(path)) {
+                            fse.remove(path);
+                        }
+                    })
+
+                }
+
             }
 
         })
@@ -54,7 +77,7 @@ exports.add = (req, res) => {
  * @param res
  * @returns {Promise<void>}
  */
-exports.handleAdding = async(data, res) => {
+exports.handleAdding = async (data, res) => {
 
     // Getting story and its parent items by its id
     let storyRes = await Stories.findOne({
@@ -144,7 +167,7 @@ exports.getById = async (req, res) => {
         }
     ));
 
-    let ret = prepareResult(result,req);
+    let ret = prepareResult(result, req);
     res.json(ret);
 
     res.json(result);
@@ -174,8 +197,6 @@ exports.updateInfo = async (req, res) => {
 
     // If image is set as cover for an *item, updating the corresponding model cover property
     if (coverItem && data['cover']) {
-        console.log(data)
-        console.log(image_id)
         await db[coverItem['model']].update({cover_id: image_id}, {where: {id: coverItem['value']}})
     }
 

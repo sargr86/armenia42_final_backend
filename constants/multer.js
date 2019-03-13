@@ -2,7 +2,6 @@
 global.multer = require('multer');
 global.UPLOAD_MAX_FILE_SIZE = 1024 * 1024;
 
-let queuedFiles = [];
 let storage = multer.diskStorage({
     destination: async (req, file, cb) => {
 
@@ -16,7 +15,6 @@ let storage = multer.diskStorage({
     }
 });
 
-
 let upload = multer({
     storage: storage,
     limits: {fileSize: UPLOAD_MAX_FILE_SIZE},
@@ -25,6 +23,16 @@ let upload = multer({
         let filetypes = /jpeg|jpg/;
         let mimetype = filetypes.test(file.mimetype);
         let extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+        let fileName = file.originalname;
+
+        // Checking if file exists
+        let filesWithThisName = searchFileRecursive(OTHER_UPLOADS_FOLDER, fileName);
+
+        if (filesWithThisName.length !== 0) {
+
+            req.fileExistsError = {msg: 'file_exists_error', name: fileName};
+            return cb(null, '', req.fileExistsError)
+        }
 
 
         // Checking if file type is valid
