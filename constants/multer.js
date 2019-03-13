@@ -2,38 +2,14 @@
 global.multer = require('multer');
 global.UPLOAD_MAX_FILE_SIZE = 1024 * 1024;
 
+let queuedFiles = [];
 let storage = multer.diskStorage({
     destination: async (req, file, cb) => {
 
-        let data = req.body;
-        let lang = data.lang;
-        let folderPath = OTHER_UPLOADS_FOLDER;
-
-
-        // Getting the translations of a name fields passed in request
-        if ('email' in data) {
-            folderPath = USERS_UPLOAD_FOLDER
-        }
-        else {
-
-            // Update case (handles also images adding to a story)
-            if ('id' in data || 'story_id' in data) {
-                console.log(data)
-                folderPath += data.folder;
-            }
-
-            // Insert case
-            else {
-
-                let names = await translateHelper(data['name_' + lang], lang, 'name');
-                folderPath += folderName(data['folder'] + '/' + names['name_en'])
-            }
-
-
-        }
-        console.log(folderPath)
-        fse.ensureDir(folderPath);
+        let folderPath = await getUploadFolder(req.body);
         cb(null, folderPath)
+
+
     },
     filename: function (req, file, cb) {
         cb(null, file.originalname) // already have got Date implemented in the name
@@ -51,6 +27,7 @@ let upload = multer({
         let extname = filetypes.test(path.extname(file.originalname).toLowerCase());
 
 
+        // Checking if file type is valid
         if (!mimetype && !extname) {
             req.fileTypeError = "invalid_file_type";
             return cb(null, false, req.fileTypeError)

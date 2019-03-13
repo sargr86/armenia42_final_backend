@@ -18,18 +18,43 @@ exports.get = async (req, res) => {
 
 
 /**
- * Handles images adding to db (also from save-story action)
+ * Manages images adding process
  * @param req
  * @param res
  * @returns {Promise<void>}
  */
-exports.add = async (req, res) => {
+exports.add = (req, res) => {
 
     let data;
+    // Story adding with images case
     if ('storyAdding' in req) {
         data = req;
+        this.handleAdding(data,res)
     }
-    else data = req.body;
+
+    // Images adding
+    else {
+        data = req.body;
+
+        uploadStoryImgs(req, res, async (err) => {
+
+            if (!hasValidationErrors(req, res, err)) {
+                this.handleAdding(data,res)
+            }
+
+        })
+    }
+
+
+};
+
+/**
+ * Handles images adding to db (also from save-story action)
+ * @param data
+ * @param res
+ * @returns {Promise<void>}
+ */
+exports.handleAdding = async(data, res) => {
 
     // Getting story and its parent items by its id
     let storyRes = await Stories.findOne({
@@ -46,7 +71,7 @@ exports.add = async (req, res) => {
     });
 
 
-    // Grabbing ids from the selected story
+    // Grabbing parents ids from the selected story
     let story = storyRes.toJSON();
     data.location_id = story.location.id;
     data.direction_id = story.location.direction.id;
@@ -59,15 +84,17 @@ exports.add = async (req, res) => {
 
     // Checking if multiple images sent or just one
     if (data.story_imgs && data.story_imgs.constructor === Array) {
+
         // Creating record for each image of the story
         let list = data.story_imgs.map(async (img) => {
             data.name = img;
             await Images.create(data)
         });
 
-        const results = await Promise.all(list);
+        await Promise.all(list);
     }
 
+    // One-image case
     else {
         data.name = data.story_imgs;
         await to(Images.create(data));
@@ -117,12 +144,8 @@ exports.getById = async (req, res) => {
         }
     ));
 
-
-    if (result) {
-        result = result.get({plain: true});
-        result['file'] = folderUrl(result);
-        result['parent_name'] = result['name_en'];
-    }
+    let ret = prepareResult(result,req);
+    res.json(ret);
 
     res.json(result);
 };

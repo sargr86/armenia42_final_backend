@@ -13,3 +13,4 @@ global.folderUrl = require('../helpers/folderUrl');
 global.nameAttr = require('../helpers/nameAttributes');
 global.prepareResult = require('../helpers/prepareResult');
 global.searchFileRecursive = require('../helpers/searchFileRecursive');
+global.getUploadFolder = require('../helpers/getUploadFolder');

@@ -89,7 +89,7 @@ exports.getById = async (req, res) => {
 exports.add = async (req, res) => {
     let data = req.body;
     let lang = data.lang;
-    uploadFlag(req, res, async (err) => {
+    uploadStoryImgs(req, res, async (err) => {
 
         if (!hasValidationErrors(req, res, err)) {
 

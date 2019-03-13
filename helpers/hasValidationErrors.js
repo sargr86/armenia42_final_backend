@@ -5,6 +5,11 @@ module.exports = (req,res,multerError)=>{
         return true;
     }
 
+    else if(req.fileExistsError){
+        res.status(424).json(req.fileExistsError);
+        return true;
+    }
+
     // Getting multer errors if any
     else if (multerError) {
         res.status(423).json(multerError);
