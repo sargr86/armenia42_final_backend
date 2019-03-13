@@ -1,26 +1,22 @@
-module.exports = async(req,itemCondition) => {
+module.exports = async (req, itemCondition) => {
     let data = req.query;
+    let ret = [];
 
     let imgAttributes = [
 
         'id', 'story_id',
-        [sequelize.fn('concat', 'http://' + req.headers.host + '/uploads/others/', sequelize.col('folder'), '/', sequelize.col('name')), 'big'],
-        [sequelize.fn('concat', 'http://' + req.headers.host + '/uploads/others/', sequelize.col('folder'), '/', sequelize.col('name')), 'medium'],
-        [sequelize.fn('concat', 'http://' + req.headers.host + '/uploads/others/', sequelize.col('folder'), '/', sequelize.col('name')), 'small'],
-        'name', 'folder', 'description_' + data.lang
+        'name', 'description_' + data.lang
     ];
 
     let where = {};
     if (data.cat_id) {
-
         where = sequelize.where(sequelize.col('location->loc_categories->loc_cats.category_id'), data.cat_id);
     }
 
-console.log(itemCondition)
     // Getting image names list from db
     let result = await Images.findAll({
         attributes: imgAttributes,
-        where: [itemCondition,where],
+        where: [itemCondition, where],
         include: [
             {
                 model: Locations, attributes: ['id'], include: [
@@ -29,9 +25,33 @@ console.log(itemCondition)
                     }
                 ]
             }],
-        // where
     });
 
-    return result;
+
+    result.map(img => {
+        img = img.toJSON();
+
+        // Searching the current file by name and appending full path on the end to it
+        let search = searchFileRecursive(OTHER_UPLOADS_FOLDER, img['name'])[0];
+
+        if (search) {
+            search = ('http://' + req.headers.host + '/' + path.relative('./', search).replace(/\\/g, '/')).replace('public', '');
+
+            // Preparation for ngx-gallery in frontend
+            img['big'] = img['small'] = img['medium'] = search;
+
+            // Separating cover image
+            if (result['cover_id'] === img['id']) {
+                result['cover'] = search;
+            }
+            // delete img['id'];
+            delete img['name'];
+            ret.push(img)
+
+        }
+
+    });
+
+    return ret;
 
 };

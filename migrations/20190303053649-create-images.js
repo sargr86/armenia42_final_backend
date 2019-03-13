@@ -29,9 +29,9 @@ module.exports = {
             fav: {
                 type: Sequelize.INTEGER
             },
-            folder: {
-                type: Sequelize.STRING
-            },
+            // folder: {
+            //     type: Sequelize.STRING
+            // },
             name: {
                 type: Sequelize.STRING
             },

@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         story_id: DataTypes.INTEGER,
         cover: DataTypes.INTEGER,
         fav: DataTypes.INTEGER,
-        folder: DataTypes.STRING,
+        // folder: DataTypes.STRING,
         name: DataTypes.STRING,
         description_en: DataTypes.TEXT,
         description_ru: DataTypes.TEXT,
