@@ -53,6 +53,10 @@ exports.getProvinceByName = async (req, res) => {
                 attributes: ['name_en', 'name_ru', 'name_hy'],
                 where: {name_en: cleanString(data.country, true)}
             },
+            {
+                model: Images, attributes: ['id','name'], required: false,
+                // where: [{where: sequelize.where(sequelize.col('`images`.`id`'), sequelize.col('`directions`.`cover_id`'))}]
+            },
         ],
     }), res);
 

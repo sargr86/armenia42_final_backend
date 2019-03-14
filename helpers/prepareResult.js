@@ -23,7 +23,7 @@ module.exports = (dt, req) => {
                     // img['name'] = search;
 
                     // Preparation for ngx-gallery in frontend
-                    img['big'] = img['small'] = img['medium'] = search;
+                    // img['big'] = img['small'] = img['medium'] = search;
 
                     // Separating cover image
                     if (dt['cover_id'] === img['id']) {
@@ -37,6 +37,7 @@ module.exports = (dt, req) => {
 
             })
         }
+        delete dt['images'];
         return dt;
     }
 
