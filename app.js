@@ -16,6 +16,7 @@ app.use(express.static('public'))
 
 // Auth Routes
 app.use('/auth', require('./routes/auth'));
+app.use('/dashboard', require('./routes/dashboard'));
 app.use('/users', require('./routes/users'));
 app.use('/countries', require('./routes/countries'));
 app.use('/provinces', require('./routes/provinces'));

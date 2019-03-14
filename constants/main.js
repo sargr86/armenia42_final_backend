@@ -11,6 +11,7 @@ global.port = process.env.port || 3000;
 global.server = require('http').createServer(app);
 global.fse = require('fs-extra');
 global.SUPPORTED_LANGUAGES  = ['en','ru','hy'];
+global.DEFAULT_APP_ITEMS = ['countries', 'provinces', 'directions', 'locations', 'stories','images'];
 
 require('./directories');
 require('./multer');
