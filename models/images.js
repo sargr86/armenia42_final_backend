@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         // images.belongsTo(models.countries, {foreignKey: "cover_id"});
         // images.belongsTo(models.directions, {foreignKey: "cover_id"});
         images.belongsTo(models.locations, {foreignKey: "location_id"});
+        images.belongsTo(models.users, {foreignKey: "user_id"});
     };
     return images;
 };

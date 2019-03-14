@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
         users.belongsToMany(models.roles, {through: models.users_roles, foreignKey: 'user_id'})
         users.belongsTo(models.users_statuses, {foreignKey: 'status_id'})
         users.hasMany(models.stories,{foreignKey:'user_id'})
+        users.hasMany(models.images,{foreignKey:'user_id'})
     };
     return users;
 };

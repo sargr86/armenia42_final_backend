@@ -156,7 +156,6 @@ exports.getById = async (req, res) => {
     let ret = prepareResult(result, req);
     res.json(ret);
 
-    res.json(result);
 };
 
 /**
