@@ -2,9 +2,8 @@ module.exports = async(data)=>{
     let lang = data.lang;
     let folderPath = OTHER_UPLOADS_FOLDER;
 
-
     // Getting the translations of a name fields passed in request
-    if ('email' in data) {
+    if (('email' in data) && !('folder' in data)) {
         folderPath = USERS_UPLOAD_FOLDER
     }
     else {

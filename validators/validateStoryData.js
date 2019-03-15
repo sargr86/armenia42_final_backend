@@ -4,14 +4,10 @@ const rules = [
     body().custom(async (req) => {
         let lang = req.lang;
 
-        if (req.category_ids === "") {
-            throw new Error('location_category_required_error')
-        }
-
         // Checks to see if a country with requested name exist (only for add-country case)
         if (!('id' in req)) {
             // Retrieving a user with request email
-            let location = await Locations.findOne({
+            let story = await Stories.findOne({
                 where: {
                     $or: [
                         {name_en: req['name_' + lang]},
@@ -20,19 +16,19 @@ const rules = [
                     ]
                 },
                 include:{
-                    model: Directions, where:{  name_en: req.parent_name}
+                    model: Locations, where:{  name_en: req.parent_name}
                 }
 
             });
             // Checking if country exists
-            if (location != null) throw new Error('location_exists_error');
+            if (story != null) throw new Error('story_exists_error');
 
         }
 
 
         // Checking if user wrote country name
         if (req['name_' + lang] === '') {
-            throw new Error('location_name_required_error')
+            throw new Error('story_name_required_error')
         }
 
 

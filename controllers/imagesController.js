@@ -66,10 +66,10 @@ exports.handleAdding = async (data, res) => {
     let storyRes = await Stories.findOne({
         where: {id: data.story_id},
         include: {
-            model: Locations, attributes: ['id','name_en'], include: {
-                model: Directions, attributes: ['id','name_en'], include: {
-                    model: Provinces, attributes: ['id','name_en'], include: {
-                        model: Countries, attributes: ['id','name_en']
+            model: Locations, attributes: ['id', 'name_en'], include: {
+                model: Directions, attributes: ['id', 'name_en'], include: {
+                    model: Provinces, attributes: ['id', 'name_en'], include: {
+                        model: Countries, attributes: ['id', 'name_en']
                     }
                 }
             }
@@ -86,8 +86,7 @@ exports.handleAdding = async (data, res) => {
     data.cover = 0;
     data.fav = 0;
     data.folder = folderUrl(story);
-
-    console.log(data)
+    data.status_id = await getReviewStatus(data, res);
 
     if (!data.story_imgs) res.json("OK");
 
@@ -114,6 +113,8 @@ exports.handleAdding = async (data, res) => {
 
         res.json("OK");
     }
+
+
 };
 
 /**
@@ -206,7 +207,12 @@ exports.remove = async (req, res) => {
         if (error) res.status(500).json(error);
     }
 
-
-    await to(Images.destroy({where: {id: data.id}}));
-    this.get(req, res)
+    if (data.story_id) {
+        await to(Images.destroy({where: {story_id: data.story_id}}));
+        this.get(req, res)
+    }
+    else {
+        await to(Images.destroy({where: {id: data.id}}));
+        this.get(req, res)
+    }
 };

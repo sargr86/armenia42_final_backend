@@ -106,25 +106,28 @@ exports.add = async (req, res) => {
 
         if (!hasValidationErrors(req, res, err)) {
 
-            // Creating the provinces folder and translating name and description of province
+            // Creating the story folder and translating name and description of story
             let names = await createFolder(data);
             let descriptions = await translateHelper(data['description_' + lang], lang, 'description');
 
-            // Retrieving country by folder name
+            // Retrieving location by folder name
             let location = await Locations.findOne({
                 where: {name_en: data.parent_name},
                 attributes: ['id']
             });
 
-            // If retrieved adding the province to it, otherwise throwing an error
+            // If retrieved, adding the location to it, otherwise throwing an error
             if (location && location['id']) {
                 data.location_id = location['id'];
+                data.status_id = await getReviewStatus(data, res);
+
                 // Adding the country data to db
                 let result = await to(Stories.create({...data, ...names, ...descriptions}), res);
 
                 // Adding necessary additional fields for images adding
                 data.story_id = result['id'];
                 data.storyAdding = 1;
+
                 if (data.story_imgs) {
 
                     await imagesController.add(data, res)
@@ -202,6 +205,10 @@ exports.remove = async (req, res) => {
     // Removing country data if there is no error previously
     if (!res.headersSent) {
         let result = await to(Stories.destroy({where: {id: data.id}}));
-        res.json(result);
+
+        req.query.story_id = data.id;
+        imagesController.remove(req,res);
+
+        // res.json(result);
     }
 };
