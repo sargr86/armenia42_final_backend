@@ -11,6 +11,9 @@ module.exports = {
             user_id: {
                 type: Sequelize.INTEGER
             },
+            status_id: {
+                type: Sequelize.INTEGER
+            },
             location_id: {
                 type: Sequelize.INTEGER
             },

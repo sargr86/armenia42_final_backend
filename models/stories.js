@@ -2,6 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
     const stories = sequelize.define('stories', {
         user_id: DataTypes.INTEGER,
+        status_id: DataTypes.INTEGER,
         location_id: DataTypes.INTEGER,
         cover_id: DataTypes.INTEGER,
         name_en: DataTypes.STRING,
@@ -16,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         stories.belongsTo(models.locations, {foreignKey: "location_id"});
         stories.belongsTo(models.users, {foreignKey: "user_id"});
         stories.hasMany(models.images, {foreignKey: "story_id"});
+        stories.belongsTo(models.review_statuses,{foreignKey: "status_id"})
     };
     return stories;
 };
