@@ -31,23 +31,30 @@ exports.getManageImgs = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
 
-    let where = {};
+    let where = [];
+    let whereUser = {};
     if (data.cat_id) {
-        where = sequelize.where(sequelize.col('location->loc_categories->loc_cats.category_id'), data.cat_id);
+        where.push({where:sequelize.where(sequelize.col('location->loc_categories->loc_cats.category_id'), data.cat_id)});
+    }
+
+    // For showing one user images
+    if(data.user_id){
+        whereUser = {id:data.user_id}
     }
 
 
     let result = await to(Images.findAll({
-        attributes: ['id', ['name', 'img_name']],
+        attributes: ['id','name'],
         include: [
             {
-                model: Users, attributes: [fullName(`first_name_${lang}`, `last_name_${lang}`)]
+                model: Users, attributes: [fullName(`first_name_${lang}`, `last_name_${lang}`)],
+                where:whereUser
             },
             {
-              model:Stories,attributes:['id']
+              model:Stories,attributes:['id',`name_${lang}`]
             },
             {
-                model: Locations, attributes: ['id'], include: [
+                model: Locations, attributes: ['id',`name_${lang}`], include: [
                     {
                         model: Categories, attributes: ['id']
                     }
@@ -63,13 +70,13 @@ exports.getManageImgs = async (req, res) => {
             img = img.toJSON();
 
             // Searching the current file by name and appending full path on the end to it
-            let search = searchFileRecursive(OTHER_UPLOADS_FOLDER, img['img_name'])[0];
+            let search = searchFileRecursive(OTHER_UPLOADS_FOLDER, img['name'])[0];
 
             if (search) {
                 search = (path.relative('./', search).replace(/\\/g, '/')).replace('public', '');
 
                 // Saving image full path
-                img['img_name'] = search;
+                img['img_path'] = search;
                 let imageUrl = folderName(search.replace('uploads/others/', ''), true);
                 imageUrl = imageUrl.substring(0, imageUrl.lastIndexOf('/'));
                 imageUrl = imageUrl.substring(0, imageUrl.lastIndexOf('/'))+'/'+img.story.id+'/image/'+img.id;
