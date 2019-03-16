@@ -61,7 +61,7 @@ exports.getManageImgs = async (req, res) => {
                 ]
             },
             {
-                model: ReviewStatuses, attributes: [`name_${lang}`]
+                model: ReviewStatuses, attributes: [`name_${lang}`, 'name_en']
             }
         ],
         where
@@ -105,4 +105,27 @@ exports.getManageImgs = async (req, res) => {
     }
 
 
+};
+
+/**
+ * Changes an image review status
+ * @param req
+ * @param res
+ */
+exports.changeReviewStatus = async (req, res) => {
+    let data = req.body;
+
+    // Getting status id
+    let status = await to(ReviewStatuses.findOne({
+        where: {name_en: data.status},
+        attributes: ['id']
+    }), res);
+
+    // Changing image status
+    let image = await to(Images.update({
+        status_id: status['id']
+    }, {where: {id: data.id}}), res);
+
+    req.query.lang = data.lang;
+    this.getManageImgs(req,res);
 };
