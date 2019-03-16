@@ -1,6 +1,7 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
     const locations = sequelize.define('locations', {
+        user_id: DataTypes.INTEGER,
         country_id: DataTypes.INTEGER,
         province_id: DataTypes.INTEGER,
         direction_id: DataTypes.INTEGER,
@@ -23,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
         }, {underscored: true});
         locations.hasMany(models.stories, {foreignKey: "location_id"});
         locations.hasMany(models.images, {foreignKey: "location_id"});
+        locations.belongsTo(models.users, {foreignKey: "user_id"});
     };
     return locations;
 };

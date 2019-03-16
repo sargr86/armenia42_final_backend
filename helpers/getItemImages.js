@@ -22,9 +22,13 @@ module.exports = async (req, itemCondition) => {
                 model: Locations, attributes: ['id'], include: [
                     {
                         model: Categories, attributes: ['id']
-                    }
+                    },
                 ]
-            }],
+            },
+            {
+                model:ReviewStatuses, where:{name_en:'accepted'},attributes:['name_en']
+            }
+        ],
     });
 
 

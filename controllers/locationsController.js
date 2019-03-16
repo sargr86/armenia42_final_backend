@@ -33,6 +33,9 @@ exports.get = async (req, res) => {
                         ]
                     },
                 ]
+            },
+            {
+                model:Users,attributes:['email']
             }
 
 

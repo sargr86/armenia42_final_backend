@@ -9,7 +9,7 @@ const imagesController = require('./imagesController');
 exports.get = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
-    let userAttributes = [];
+    let userAttributes = ['email'];
     userAttributes.push(fullName(`first_name_${lang}`, `last_name_${lang}`));
     let result = await to(Stories.findAll({
         attributes: ['id', 'name_en', `name_${lang}`],
