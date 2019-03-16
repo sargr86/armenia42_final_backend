@@ -34,32 +34,36 @@ exports.getManageImgs = async (req, res) => {
     let where = [];
     let whereUser = {};
     if (data.cat_id) {
-        where.push({where:sequelize.where(sequelize.col('location->loc_categories->loc_cats.category_id'), data.cat_id)});
+        where.push({where: sequelize.where(sequelize.col('location->loc_categories->loc_cats.category_id'), data.cat_id)});
     }
 
     // For showing one user images
-    if(data.user_id){
-        whereUser = {id:data.user_id}
+    if (data.user_id) {
+        whereUser = {id: data.user_id}
     }
 
 
     let result = await to(Images.findAll({
-        attributes: ['id','name'],
+        attributes: ['id', 'name'],
         include: [
             {
                 model: Users, attributes: [fullName(`first_name_${lang}`, `last_name_${lang}`)],
-                where:whereUser
+                where: whereUser
             },
             {
-              model:Stories,attributes:['id',`name_${lang}`]
+                model: Stories, attributes: ['id', `name_${lang}`]
             },
             {
-                model: Locations, attributes: ['id',`name_${lang}`], include: [
+                model: Locations, attributes: ['id', `name_${lang}`], include: [
                     {
                         model: Categories, attributes: ['id']
                     }
                 ]
-            }],
+            },
+            {
+                model: ReviewStatuses, attributes: [`name_${lang}`]
+            }
+        ],
         where
     }), res);
 
@@ -79,7 +83,7 @@ exports.getManageImgs = async (req, res) => {
                 img['img_path'] = search;
                 let imageUrl = folderName(search.replace('uploads/others/', ''), true);
                 imageUrl = imageUrl.substring(0, imageUrl.lastIndexOf('/'));
-                imageUrl = imageUrl.substring(0, imageUrl.lastIndexOf('/'))+'/'+img.story.id+'/image/'+img.id;
+                imageUrl = imageUrl.substring(0, imageUrl.lastIndexOf('/')) + '/' + img.story.id + '/image/' + img.id;
                 img['url'] = imageUrl;
 
                 // Separating cover image

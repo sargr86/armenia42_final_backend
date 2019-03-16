@@ -200,6 +200,7 @@ exports.updateInfo = async (req, res) => {
 exports.remove = async (req, res) => {
     let data = req.query;
 
+    // Removing file of current image (if selected)
     if (data.withFile) {
         let imageFile = OTHER_UPLOADS_FOLDER + folderName(data['file']);
 
@@ -207,10 +208,13 @@ exports.remove = async (req, res) => {
         if (error) res.status(500).json(error);
     }
 
+    // Removing by story
     if (data.story_id) {
         await to(Images.destroy({where: {story_id: data.story_id}}));
         this.get(req, res)
     }
+
+    // Removing by image
     else {
         await to(Images.destroy({where: {id: data.id}}));
         this.get(req, res)
