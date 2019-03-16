@@ -46,7 +46,7 @@ exports.get = async (req, res) => {
  * @returns {Promise<void>}
  */
 exports.getImages = async (req, res) => {
-    let result = await getItemImages(req,{location_id: req.query.parent_id});
+    let result = await getItemImages(req, {location_id: req.query.parent_id});
     res.json(result);
 };
 
@@ -67,7 +67,7 @@ exports.getById = async (req, res) => {
             id: data.story,
             where: sequelize.where(sequelize.col('location.name_en'), cleanString(data.location, true))
         },
-        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`,'user_id'], // user_id needed for breadcrumb((
+        attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'user_id'], // user_id needed for breadcrumb((
         include: [
             {
                 model: Locations, attributes: ['name_en', 'name_ru', 'name_hy'], include: [
@@ -88,7 +88,7 @@ exports.getById = async (req, res) => {
         ],
     }), res);
 
-    let ret = prepareResult(result,req);
+    let ret = prepareResult(result, req);
     res.json(ret);
 };
 
@@ -112,7 +112,7 @@ exports.add = async (req, res) => {
 
             // Retrieving location by folder name
             let location = await Locations.findOne({
-                where: {name_en: data.parent_name},
+                where: {name_en: cleanString(data.parent_name, true)},
                 attributes: ['id']
             });
 
@@ -207,7 +207,8 @@ exports.remove = async (req, res) => {
         let result = await to(Stories.destroy({where: {id: data.id}}));
 
         req.query.story_id = data.id;
-        imagesController.remove(req,res);
+        req.query.removeByStory = 1;
+        imagesController.remove(req, res);
 
         // res.json(result);
     }

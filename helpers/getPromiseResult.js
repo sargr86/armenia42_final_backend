@@ -5,8 +5,8 @@ module.exports = (promise,res = '') => {
             return data;
     })
     .catch(err => {
-        console.log(err)
-        if(res) res.status(500).json(err)
+        console.log('here!!!!!!')
+        if(res && !res.headersSent) res.status(500).json(err)
         else return err;
     });
 };

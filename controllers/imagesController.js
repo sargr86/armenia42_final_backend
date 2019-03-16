@@ -11,12 +11,12 @@ exports.get = async (req, res) => {
         // attributes:['id','country_id','province_id','direction_id','location_id','story_id','name'],
         attributes: [['name', 'big'], ['name', 'medium'], ['name', 'small'], 'id', ['description_' + lang, 'description'], 'cover', 'fav'],
         where: {story_id: data.story_id},
-        include:[
+        include: [
             {
-                model:Users,attributes:['email']
+                model: Users, attributes: ['email']
             },
             {
-                model: ReviewStatuses,attributes:['name_en']
+                model: ReviewStatuses, attributes: ['name_en']
             }
         ]
     }));
@@ -213,11 +213,13 @@ exports.remove = async (req, res) => {
         let imageFile = OTHER_UPLOADS_FOLDER + folderName(data['file']);
 
         let error = await to(removeFile(imageFile), res);
-        if (error) res.status(500).json(error);
+        if (error && !res.headersSent) {
+            res.status(500).json(error);
+        }
     }
 
     // Removing by story
-    if (data.story_id) {
+    if (data.story_id && data.removeByStory) {
         await to(Images.destroy({where: {story_id: data.story_id}}));
         this.get(req, res)
     }

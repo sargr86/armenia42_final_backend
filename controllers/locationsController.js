@@ -25,7 +25,7 @@ exports.get = async (req, res) => {
                 required: false
             },
             {
-                model: Directions, where: {name_en: data.parent_name},
+                model: Directions, where: {name_en: cleanString(data.parent_name,true)},
                 attributes: ['name_en', `name_${lang}`], include: [
                     {
                         model: Provinces, attributes: ['name_en'], include: [
@@ -74,7 +74,7 @@ exports.getByName = async (req, res) => {
 
         where: {
             name_en: cleanString(data.location),
-            where: sequelize.where(sequelize.col('direction.name_en'), cleanString(data.direction))
+            where: sequelize.where(sequelize.col('direction.name_en'), cleanString(data.direction,true))
         },
         attributes: ['id', 'name_en', 'name_ru', 'name_hy', `description_${lang}`, 'flag_img', 'cover_id'],
         include: [
@@ -90,7 +90,7 @@ exports.getByName = async (req, res) => {
                 where: [{where: sequelize.where(sequelize.col('`images`.`id`'), sequelize.col('`locations`.`cover_id`'))}]
             },
             {
-                model: Directions, where: {name_en: data.direction},
+                model: Directions, where: {name_en: cleanString(data.direction,true)},
                 attributes: ['name_en', 'name_ru', 'name_hy', 'province_id'], include: [
                     {
                         model: Provinces, attributes: ['name_en', 'name_ru', 'name_hy'], include: [
