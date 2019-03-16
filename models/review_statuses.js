@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     name_en: DataTypes.STRING,
     name_ru: DataTypes.STRING,
     name_hy: DataTypes.STRING
-  }, {});
+  }, {timestamps:false});
   review_statuses.associate = function(models) {
     // associations can be defined here
   };

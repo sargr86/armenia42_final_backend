@@ -31,10 +31,19 @@ exports.getManageImgs = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
 
+    // Setting where conditions here
     let where = [];
     let whereUser = {};
+    let whereStatus = {};
+
+    // Checking if category passed
     if (data.cat_id) {
         where.push({where: sequelize.where(sequelize.col('location->loc_categories->loc_cats.category_id'), data.cat_id)});
+    }
+
+    // Checking if status passed
+    if(data.status){
+        whereStatus = {name_en:data.status};
     }
 
     // For showing one user images
@@ -61,7 +70,8 @@ exports.getManageImgs = async (req, res) => {
                 ]
             },
             {
-                model: ReviewStatuses, attributes: [`name_${lang}`, 'name_en']
+                model: ReviewStatuses, attributes: [`name_${lang}`, 'name_en'],
+                where:whereStatus
             }
         ],
         where
@@ -127,5 +137,18 @@ exports.changeReviewStatus = async (req, res) => {
     }, {where: {id: data.id}}), res);
 
     req.query.lang = data.lang;
-    this.getManageImgs(req,res);
+    req.query.status = data.status === 'rejected'?'accepted':'rejected';
+
+    this.getManageImgs(req, res);
+};
+
+
+/**
+ * Gets review statuses list for filtering
+ * @param req
+ * @param res
+ */
+exports.getReviewStatuses = async(req, res) => {
+   let st =  await ReviewStatuses.findAll({});
+    res.json(st)
 };
