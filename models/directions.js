@@ -1,6 +1,7 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
     const directions = sequelize.define('directions', {
+        user_id: DataTypes.INTEGER,
         province_id: DataTypes.INTEGER,
         cover_id: DataTypes.INTEGER,
         name_en: DataTypes.STRING,
@@ -16,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         directions.belongsTo(models.provinces, {foreignKey: "province_id"});
         directions.hasMany(models.images, {foreignKey: "direction_id"});
         directions.hasMany(models.locations, {foreignKey: "direction_id"});
+        directions.belongsTo(models.users, {foreignKey: "user_id"});
     };
     return directions;
 };

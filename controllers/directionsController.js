@@ -27,6 +27,9 @@ exports.get = async (req, res) => {
                 model: Locations, attributes: ['name_en'], include: [
                     {model: Categories, attributes: ['name_en']}
                 ]
+            },
+            {
+                model:Users,attributes:['email']
             }
         ],
         where,
