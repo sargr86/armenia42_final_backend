@@ -5,7 +5,7 @@ module.exports = async (req, itemCondition) => {
     let imgAttributes = [
 
         'id', 'story_id',
-        'name', 'description_' + data.lang
+        'name', ['description_' + data.lang,'description']
     ];
 
     let where = {};

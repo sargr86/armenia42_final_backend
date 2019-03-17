@@ -1,6 +1,7 @@
 // Multer stuff
 global.multer = require('multer');
 global.UPLOAD_MAX_FILE_SIZE = 1024 * 1024;
+const path = require('path');
 
 let storage = multer.diskStorage({
     destination: async (req, file, cb) => {
@@ -12,7 +13,16 @@ let storage = multer.diskStorage({
 
     },
     filename: function (req, file, cb) {
-        cb(null, file.originalname) // already have got Date implemented in the name
+        // console.log(req.body)
+        let originalName = file.originalname.replace(/[ .]/g, "_");
+        let name = path.parse(originalName).name;
+        let extname = path.parse(name).ext.toLowerCase();
+        // console.log('!!!!!!!')
+        // console.log(originalName)
+        // console.log(name)
+        // console.log(extname)
+        // console.log('!!!!!!!')
+        cb(null, name + extname) // already have got Date implemented in the name
     }
 });
 

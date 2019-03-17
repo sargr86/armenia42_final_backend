@@ -103,7 +103,7 @@ exports.handleAdding = async (data, res) => {
 
         // Creating record for each image of the story
         let list = data.story_imgs.map(async (img) => {
-            data.name = img;
+            data.name = img.replace(/[ .]/g, "_");
             await Images.create(data)
         });
 
@@ -112,7 +112,7 @@ exports.handleAdding = async (data, res) => {
 
     // One-image case
     else {
-        data.name = data.story_imgs;
+        data.name = data.story_imgs.replace(/[ .]/g, "_");
         await to(Images.create(data));
     }
 

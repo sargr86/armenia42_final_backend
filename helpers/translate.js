@@ -13,7 +13,7 @@ module.exports = async (str,from,field) => {
     let langs = ['en', 'ru', 'hy'];
     let r = langs.map(async (lang) => {
         let res = await translate(str, {to: lang});
-        return {name:field+'_'+lang,res:cleanString(res['text'])};
+        return {name:field+'_'+lang,res:(field ==='description'?res['text']:cleanString(res['text']))};
     });
 
 
