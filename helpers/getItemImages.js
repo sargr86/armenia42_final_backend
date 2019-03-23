@@ -5,7 +5,9 @@ module.exports = async (req, itemCondition) => {
     let imgAttributes = [
 
         'id', 'story_id',
-        'name', ['description_' + data.lang,'description']
+        'name', 'year',
+        ['description_' + data.lang,'description'],
+        // [sequelize.fn('concat', sequelize.fn('COALESCE',sequelize.col('images.description_' + data.lang), ' (', sequelize.col('year'),')','')), 'description']
     ];
 
     let where = {};

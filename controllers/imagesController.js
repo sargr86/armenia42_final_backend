@@ -9,7 +9,10 @@ exports.get = async (req, res) => {
     let lang = data.lang;
     let result = await to(Images.findAll({
         // attributes:['id','country_id','province_id','direction_id','location_id','story_id','name'],
-        attributes: [['name', 'big'], ['name', 'medium'], ['name', 'small'], 'id', ['description_' + lang, 'description'], 'cover', 'fav'],
+        attributes: [['name', 'big'], ['name', 'medium'], ['name', 'small'], 'id','year',
+            ['description_' + data.lang,'description'],
+            // [sequelize.fn('concat', sequelize.fn('COALESCE',sequelize.col('images.description_' + data.lang), ' (', sequelize.col('year'),')','')), 'description'],
+             'cover', 'fav'],
         where: {story_id: data.story_id},
         include: [
             {
@@ -136,7 +139,7 @@ exports.getById = async (req, res) => {
     let result = await to(Images.findOne(
         {
             where: {id: data.id},
-            attributes: ['id', 'name', `description_${lang}`, 'cover', 'fav', 'country_id', 'province_id', 'direction_id', 'location_id'],
+            attributes: ['id', 'name', `description_${lang}`, 'cover', 'fav', 'year', 'country_id', 'province_id', 'direction_id', 'location_id'],
             include: [
                 {
                     model: Stories, include: [

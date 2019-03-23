@@ -41,6 +41,9 @@ module.exports = {
             name: {
                 type: Sequelize.STRING
             },
+            year:{
+                type: Sequelize.INTEGER
+            },
             description_en: {
                 type: Sequelize.TEXT
             },

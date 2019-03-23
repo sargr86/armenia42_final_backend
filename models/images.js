@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
         fav: DataTypes.INTEGER,
         // folder: DataTypes.STRING,
         name: DataTypes.STRING,
+        year: DataTypes.INTEGER,
         description_en: DataTypes.TEXT,
         description_ru: DataTypes.TEXT,
         description_hy: DataTypes.TEXT
