@@ -13,7 +13,12 @@ exports.get = async (req, res) => {
             ['description_' + data.lang,'description'],
             // [sequelize.fn('concat', sequelize.fn('COALESCE',sequelize.col('images.description_' + data.lang), ' (', sequelize.col('year'),')','')), 'description'],
              'cover', 'fav'],
-        where: {story_id: data.story_id},
+        where: {
+            story_id: data.story_id,
+            year:{
+                $between: [data.start, data.end]
+            }
+        },
         include: [
             {
                 model: Users, attributes: ['email']
