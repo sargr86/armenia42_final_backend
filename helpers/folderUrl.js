@@ -6,7 +6,6 @@ module.exports = (data, lang = 'en', reverse = true, file = true) => {
     build(data, '', reverse);
     // Returns only unique results array
     // return result.filter((t = {}, e => !(t[e] = e in t)));
-    // console.log(folderUrl)
     return folderName(folderUrl,true);
 };
 

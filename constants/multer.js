@@ -13,16 +13,16 @@ let storage = multer.diskStorage({
 
     },
     filename: function (req, file, cb) {
-        // console.log(req.body)
-        let originalName = file.originalname.replace(/[ .]/g, "_");
+        let originalName = file.originalname.replace(/.jpeg|.jpg|.png/g, "").replace(/ /g, '_');
+        // originalName = originalName
         let name = path.parse(originalName).name;
         let extname = path.parse(name).ext.toLowerCase();
-        // console.log('!!!!!!!')
-        // console.log(originalName)
+        console.log('!!!!!!!')
+        console.log(originalName)
         // console.log(name)
         // console.log(extname)
-        // console.log('!!!!!!!')
-        cb(null, name + extname) // already have got Date implemented in the name
+        console.log('!!!!!!!')
+        cb(null, originalName) // already have got Date implemented in the name
     }
 });
 

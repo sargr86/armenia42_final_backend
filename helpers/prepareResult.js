@@ -5,6 +5,7 @@ module.exports = (dt, req) => {
 
         // Appends the necessary missing items
         dt = dt.get({plain: true});
+
         dt['folder'] = folderUrl(dt);
         dt['parent_name'] = dt['name_en'];
 

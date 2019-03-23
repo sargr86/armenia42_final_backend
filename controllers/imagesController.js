@@ -7,16 +7,25 @@
 exports.get = async (req, res) => {
     let data = req.query;
     let lang = data.lang;
+    let yearCondition = {
+
+        $between: [data.start, data.end]
+    };
+    if (data.includeNullYearValues === '1') {
+        yearCondition['$eq'] = null;
+    }
+
     let result = await to(Images.findAll({
         // attributes:['id','country_id','province_id','direction_id','location_id','story_id','name'],
-        attributes: [['name', 'big'], ['name', 'medium'], ['name', 'small'], 'id','year',
-            ['description_' + data.lang,'description'],
+        attributes: [['name', 'big'], ['name', 'medium'], ['name', 'small'], 'id', 'year',
+            ['description_' + data.lang, 'description'],
             // [sequelize.fn('concat', sequelize.fn('COALESCE',sequelize.col('images.description_' + data.lang), ' (', sequelize.col('year'),')','')), 'description'],
-             'cover', 'fav'],
+            'cover', 'fav'],
         where: {
             story_id: data.story_id,
-            year:{
-                $between: [data.start, data.end]
+            year: {
+                $or: yearCondition
+
             }
         },
         include: [
@@ -111,16 +120,18 @@ exports.handleAdding = async (data, res) => {
 
         // Creating record for each image of the story
         let list = data.story_imgs.map(async (img) => {
-            data.name = img.replace(/[ .]/g, "_");
+            data.name = img.replace(/.jpeg|.jpg|.png/g, "").replace(/ /g, '_')
+            console.log(img)
             await Images.create(data)
         });
 
         await Promise.all(list);
     }
-
     // One-image case
     else {
-        data.name = data.story_imgs.replace(/[ .]/g, "_");
+        // data.name = data.story_imgs.replace(/[ .]/g, "_");
+        data.name = data.story_imgs.replace(/.jpeg|.jpg|.png/g, "").replace(/ /g, '_');
+        console.log(data)
         await to(Images.create(data));
     }
 
