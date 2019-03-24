@@ -120,8 +120,7 @@ exports.handleAdding = async (data, res) => {
 
         // Creating record for each image of the story
         let list = data.story_imgs.map(async (img) => {
-            data.name = img.replace(/.jpeg|.jpg|.png/g, "").replace(/ /g, '_')
-            console.log(img)
+            data.name = prepareImgName(img);
             await Images.create(data)
         });
 
@@ -130,8 +129,13 @@ exports.handleAdding = async (data, res) => {
     // One-image case
     else {
         // data.name = data.story_imgs.replace(/[ .]/g, "_");
-        data.name = data.story_imgs.replace(/.jpeg|.jpg|.png/g, "").replace(/ /g, '_');
-        console.log(data)
+        // let name = data.story_imgs.replace(/ /g, '_');
+        // name = name.replace(/.jpeg|.jpg|.png/g, "");
+        // data.name = name;
+        // console.log('<<<<<')
+        // console.log(data)
+        // console.log('<<<<<')
+        data.name =  prepareImgName(data.story_imgs);
         await to(Images.create(data));
     }
 
@@ -142,6 +146,12 @@ exports.handleAdding = async (data, res) => {
     }
 
 
+};
+
+exports.replaceImgName = (img) =>{
+    let name = img.replace(/ /g, '_');
+    name = name.replace(/.jpeg|.jpg|.png/g, "")
+    return name;
 };
 
 /**

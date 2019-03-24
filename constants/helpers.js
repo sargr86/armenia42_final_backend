@@ -17,3 +17,4 @@ global.getUploadFolder = require('../helpers/getUploadFolder');
 global.getItemImages = require('../helpers/getItemImages');
 global.handleExistingFiles = require('../helpers/handleExistingFiles');
 global.getReviewStatus = require('../helpers/getUserItemReviewStatus');
+global.prepareImgName = require('../helpers/prepareImgName');

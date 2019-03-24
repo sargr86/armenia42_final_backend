@@ -13,7 +13,8 @@ let storage = multer.diskStorage({
 
     },
     filename: function (req, file, cb) {
-        let originalName = file.originalname.replace(/.jpeg|.jpg|.png/g, "").replace(/ /g, '_');
+        // let originalName = file.originalname.replace(/.jpeg|.jpg|.png/g, "").replace(/ /g, '_');
+        let originalName = prepareImgName(file.originalname);
         // originalName = originalName
         let name = path.parse(originalName).name;
         let extname = path.parse(name).ext.toLowerCase();
