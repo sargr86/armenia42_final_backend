@@ -148,12 +148,6 @@ exports.handleAdding = async (data, res) => {
 
 };
 
-exports.replaceImgName = (img) =>{
-    let name = img.replace(/ /g, '_');
-    name = name.replace(/.jpeg|.jpg|.png/g, "")
-    return name;
-};
-
 /**
  * Gets an image info by its id
  * @param req
@@ -211,7 +205,7 @@ exports.updateInfo = async (req, res) => {
     let {id, lang, ...fields} = data;
 
     // if translate flag is enabled, getting translated names of stories and appending to the request
-    if (translate) {
+    if (translate && data['description_' + lang]) {
 
         let descFields = await translateHelper(data['description_' + lang], lang, 'description');
         fields = {...data, ...descFields};
